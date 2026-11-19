@@ -12,25 +12,32 @@ Le baromètre éclaire l'allocation entre actions (A), obligations d'État (O), 
 
 Neuf indicateurs (19 séries) couvrent sept des huit familles citées par le sujet : PIB, inflation, indices boursiers, volatilité, taux, matières premières, risque/incertitude. Trois zones : États-Unis, zone euro, Japon. La Chine est écartée faute de séries gratuites et automatisables (inflation, courbe et indice boursier), mais reste présente via le risque géopolitique.
 
-| Famille (poids) | Indicateur | Mesure retenue | Poids | Sens |
-|--------------|---------------|------------------------------|----:|---|
-| Croissance (30 %) | PIB réel | Glissement annuel | 15 % | + |
-| | Indicateur avancé OCDE (CLI) | Niveau | 15 % | + |
-| Inflation (20 %) | Écart à la cible | − \|inflation − 2 %\| (PCE US, IPCH, IPC Japon) | 20 % | − |
-| Marchés (30 %) | Tendance actions | Cours / moyenne 12 mois (S&P 500, Euro Stoxx 50, Nikkei 225) | 15 % | + |
-| | Pente de la courbe | Taux 10 ans − taux 3 mois | 15 % | + |
-| Risque – socle mondial (20 %) | VIX ; spread Baa − 10 ans US ; risque géopolitique (GPR) ; Brent / moyenne 12 mois | Niveau (Brent : écart à la tendance) | 4 × 5 % | − |
+Chaque indicateur répond à une question précise de l'investisseur ; le sens indique si une hausse améliore (+) ou dégrade (−) le score.
 
-Le socle de risque est commun aux trois zones. Hors score, le **pilier valorisation** mesure l'attrait des actions (prime de risque de Shiller : 1/CAPE − taux réel 10 ans US) et des obligations (taux réel 10 ans par zone).
+| Indicateur (poids, sens) | Série et mesure | Pourquoi cet indicateur |
+|------------------|------------------------|------------------------------------------|
+| **Croissance (30 %)** | | |
+| PIB réel (15 %, +) | GDPC1, PIB EA20, PIB Japon ; glissement annuel | Mesure directe de l'activité, socle des bénéfices des entreprises. Publié par trimestre et avec retard, d'où l'indicateur suivant. |
+| Indicateur avancé OCDE – CLI (15 %, +) | CLI OCDE par zone ; niveau | Anticipe de 6 à 9 mois les retournements du cycle et compense le retard du PIB ; méthode identique pour les trois zones. |
+| **Inflation (20 %)** | | |
+| Écart d'inflation à 2 % (20 %, −) | Déflateur PCE (US), IPCH (zone euro), IPC (Japon) ; − \|glissement annuel − 2 %\| | La cible de 2 % guide les banques centrales : au-dessus, resserrement monétaire ; en dessous, demande faible. Chaque zone est mesurée sur l'indice que cible sa banque centrale. |
+| **Marchés financiers (30 %)** | | |
+| Tendance actions (15 %, +) | S&P 500, Euro Stoxx 50, Nikkei 225 ; cours / moyenne 12 mois | Résume les anticipations de bénéfices des investisseurs ; le ratio, sans unité, rend comparables des indices de niveaux très différents. |
+| Pente 10 ans − 3 mois (15 %, +) | T10Y3M (US), courbe AAA BCE, taux OCDE (Japon) | Meilleur indicateur avancé reconnu des récessions : une courbe inversée les a précédées. Seule mesure de la courbe homogène entre les trois zones. |
+| **Risque – socle mondial (20 %)** | | |
+| VIX (5 %, −) | VIXCLS ; niveau | Volatilité implicite à 30 jours du S&P 500 : thermomètre mondial de l'aversion au risque. |
+| Spread de crédit (5 %, −) | BAA10Y : Moody's Baa − 10 ans US | Prix du risque de défaut et coût de financement des entreprises. Préféré au spread haut rendement, dont l'historique gratuit est tronqué à 3 ans. |
+| Risque géopolitique (5 %, −) | GPR de Caldara et Iacoviello ; niveau | Seule mesure chiffrée, gratuite et mensuelle des tensions géopolitiques ; intègre la Chine, absente des zones. |
+| Choc pétrolier (5 %, −) | Brent ; cours / moyenne 12 mois | Choc d'offre qui freine la croissance et relance l'inflation ; l'écart à la tendance isole le choc, que le niveau en dollars ne mesure pas. |
+| **Valorisation (hors score, corrige l'allocation)** | | |
+| Attrait des actions | 1/CAPE de Shiller − taux réel 10 ans US (DFII10) | Rendement des bénéfices lissé sur 10 ans comparé au placement réel sans risque : plus le CAPE est élevé, plus les rendements futurs tendent à être faibles. |
+| Attrait des obligations | Taux réel 10 ans : TIPS (US), taux nominal − inflation (zone euro, Japon) | Rémunération réelle offerte par les obligations d'État, seule mesure comparable entre zones. |
+
+**Écartés** : flux de capitaux (séries de référence payantes) ; taux directeurs et change, affichés en contexte car leur effet sur le climat est ambigu ; Chine (pas de séries gratuites d'inflation, de courbe et d'indice boursier).
 
 ## 2. Sources de données
 
-Uniquement des sources publiques et gratuites, sans clé d'API exposée :
-
-- **FRED** (Fed de Saint-Louis, CSV) : VIXCLS, BAA10Y, DCOILBRENTEU, GDPC1, PCEPI, SP500, T10Y3M, NIKKEI225, DFII10, TB3MS.
-- **BCE – ECB Data Portal** (API SDMX) : IPCH zone euro, Euro Stoxx 50, courbe AAA (pente 10 ans − 3 mois et taux 10 ans). **Eurostat** : PIB EA20 (namq_10_gdp).
-- **OCDE** (API SDMX) : CLI (zone euro = composite Allemagne, France, Italie, Espagne), PIB trimestriel Japon, taux long et court japonais. **DBnomics** : IPC Japon (Statistics Japan).
-- **Fichiers en ligne** : indice GPR de Caldara et Iacoviello (xls) ; données de R. Shiller (ie_data.xls : CAPE, S&P long, dividendes, taux 10 ans, IPC).
+Uniquement des sources publiques et gratuites, sans clé d'API exposée : **FRED** (Fed de Saint-Louis, fichiers CSV : VIX, spread Baa, Brent, PIB et PCE US, S&P 500, pente US, Nikkei 225, taux réel US, bons à 3 mois) ; **BCE – ECB Data Portal** (API SDMX : IPCH, Euro Stoxx 50, courbe AAA) ; **Eurostat** (PIB EA20) ; **OCDE** (API SDMX : CLI, PIB et taux japonais) ; **DBnomics** (IPC Japon) ; fichiers en ligne de **Caldara et Iacoviello** (GPR) et de **R. Shiller** (CAPE, S&P long, dividendes, taux 10 ans, IPC).
 
 ## 3. Méthode de collecte
 

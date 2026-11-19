@@ -1,4 +1,4 @@
-# Projet : Baromètre synthétique mondial (KEDGE, gestion d'actifs)
+# Projet : Isobare, baromètre synthétique mondial (KEDGE, gestion d'actifs)
 Référence unique : docs/Barometre_note_de_cadrage_v4.docx. En cas de doute, 
 la note fait foi.
 Rendu attendu : site Netlify fonctionnel + note PDF de 2 pages max.

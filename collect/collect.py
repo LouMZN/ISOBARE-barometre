@@ -1,4 +1,4 @@
-"""Baromètre synthétique mondial : collecte et calculs (note de cadrage v4).
+"""Isobare (baromètre synthétique mondial) : collecte et calculs (note de cadrage v4).
 
 Étapes :
   1. collecte des séries (fonctions de test_sources.py) ; en cas d'échec d'une

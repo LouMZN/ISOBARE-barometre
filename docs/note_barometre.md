@@ -1,5 +1,5 @@
 ---
-title: "Baromètre synthétique mondial"
+title: "Isobare"
 subtitle: "KEDGE BS – Gestion d'actifs 2025-2026 · Note méthodologique et lecture au 19 novembre 2026"
 lang: fr
 ---

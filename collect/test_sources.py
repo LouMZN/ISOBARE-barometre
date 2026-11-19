@@ -2,7 +2,11 @@
 
 Pour chacune des 19 séries du score de climat, le script télécharge la série
 et affiche : série / source / OK-KO / première date / dernière date / fréquence.
-Il teste aussi les séries de valorisation et les alternatives proposées.
+Il teste aussi les séries de valorisation.
+
+CLI : la note v4 prévoyait DBnomics, figé à mai 2026 et sans série zone euro.
+On interroge donc l'OCDE directement ; la zone euro est approchée par la
+moyenne pondérée des CLI Allemagne, France, Italie, Espagne (~75 % du PIB).
 
 Statuts :
   OK      série téléchargée et à jour
@@ -219,16 +223,15 @@ SERIES_19 = [
     ("Socle", "Brent", "FRED, DCOILBRENTEU", lambda: fred("DCOILBRENTEU")),
     # États-Unis
     ("États-Unis", "PIB réel", "FRED, GDPC1", lambda: fred("GDPC1")),
-    ("États-Unis", "CLI OCDE", "DBnomics, OECD CLI USA",
-     lambda: dbnomics("OECD", "DSD_STES@DF_CLI", "USA.M.LI.IX._Z.AA.IX._Z.H")),
+    ("États-Unis", "CLI OCDE", "OCDE, DF_CLI USA", lambda: cli_ocde("USA")),
     ("États-Unis", "Inflation (déflateur PCE)", "FRED, PCEPI", lambda: fred("PCEPI")),
     ("États-Unis", "Actions (S&P 500)", "FRED, SP500", lambda: fred("SP500")),
     ("États-Unis", "Pente 10 ans - 3 mois", "FRED, T10Y3M", lambda: fred("T10Y3M")),
     # Zone euro
     ("Zone euro", "PIB réel", "Eurostat, namq_10_gdp EA20",
      lambda: eurostat("namq_10_gdp", "Q.CLV10_MEUR.SCA.B1GQ.EA20")),
-    ("Zone euro", "CLI OCDE", "DBnomics, OECD CLI EA20",
-     lambda: dbnomics("OECD", "DSD_STES@DF_CLI", "EA20.M.LI.IX._Z.AA.IX._Z.H")),
+    ("Zone euro", "CLI OCDE (DE/FR/IT/ES)", "OCDE, DF_CLI composite 4 pays",
+     cli_zone_euro_composite),
     ("Zone euro", "Inflation (IPCH)", "BCE, HICP.M.U2.N.000000.4D0.ANR",
      lambda: bce("HICP/M.U2.N.000000.4D0.ANR")),
     ("Zone euro", "Actions (Euro Stoxx 50)", "BCE, FM...DJES50I.HSTA",
@@ -237,8 +240,7 @@ SERIES_19 = [
      lambda: bce("YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SRS_10Y_3M")),
     # Japon
     ("Japon", "PIB réel", "OCDE, QNA (B1GQ volume)", pib_japon),
-    ("Japon", "CLI OCDE", "DBnomics, OECD CLI JPN",
-     lambda: dbnomics("OECD", "DSD_STES@DF_CLI", "JPN.M.LI.IX._Z.AA.IX._Z.H")),
+    ("Japon", "CLI OCDE", "OCDE, DF_CLI JPN", lambda: cli_ocde("JPN")),
     ("Japon", "Inflation (IPC)", "DBnomics, STATJP CPIm 001",
      lambda: dbnomics("STATJP", "CPIm", "001")),
     ("Japon", "Actions (Nikkei 225)", "FRED, NIKKEI225", lambda: fred("NIKKEI225")),
@@ -252,14 +254,6 @@ SERIES_VALORISATION = [
      lambda: bce("YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y")),
     ("Valorisation", "Taux 10 ans Japon", "OCDE, FINMARK IRLT", taux_long_japon),
 ]
-
-SERIES_ALTERNATIVES = [
-    ("Alternative", "CLI États-Unis", "OCDE direct, DF_CLI USA", lambda: cli_ocde("USA")),
-    ("Alternative", "CLI Japon", "OCDE direct, DF_CLI JPN", lambda: cli_ocde("JPN")),
-    ("Alternative", "CLI zone euro (DE/FR/IT/ES)", "OCDE direct, composite",
-     cli_zone_euro_composite),
-]
-
 
 # --------------------------------------------------------------------------
 # Diagnostic et affichage
@@ -330,8 +324,7 @@ def tableau_markdown(df):
 def main():
     print(f"Test des sources du baromètre - {date.today():%d/%m/%Y}\n")
     blocs = [("Les 19 séries du score de climat (note v4)", SERIES_19),
-             ("Valorisation (hors score de climat)", SERIES_VALORISATION),
-             ("Alternatives proposées", SERIES_ALTERNATIVES)]
+             ("Valorisation (hors score de climat)", SERIES_VALORISATION)]
     resultats = []
     for titre, series in blocs:
         print(f"{titre} :")

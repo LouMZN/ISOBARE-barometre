@@ -73,10 +73,35 @@ h3{font:600 15px/1.3 var(--body); margin:0}
   .navw .lbl{display:none} .seg .lg{display:none} .seg .sh{display:inline}
 }
 /* Verdict */
-.verdict{margin:18px 0 0; padding:10px 14px; background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:6px; font-size:14px; line-height:1.5}
-.verdict .sep{color:var(--muted); margin:0 2px}
-.verdict .vi{white-space:nowrap}
-.verdict .dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:0}
+/* Structure en cinq sections */
+.eyebrow{font:500 12px/1.3 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin:0 0 4px}
+section{border-top:1px solid var(--line); margin-top:28px}
+section:first-of-type{border-top:0; margin-top:0}
+.sig{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media (max-width:900px){.sig{grid-template-columns:1fr}}
+.signal{font-size:15.5px; line-height:1.5; margin:14px 0 0; border-left:3px solid var(--accent); padding:2px 0 2px 12px}
+.ctitle{font:600 15.5px/1.4 var(--body); margin:0}
+.subh{font:600 18px/1.3 var(--display); margin:30px 0 6px; scroll-margin-top:64px}
+.mblock{margin:22px 0 0}
+.mh{display:flex; align-items:center; gap:10px; font:600 17px/1.3 var(--display); margin:0 0 10px}
+.mn{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--surface); font:600 13px var(--mono); flex:none}
+.fam{font-weight:600}
+td.todo{color:var(--warn); font-weight:600}
+.steps{padding-left:18px; margin:0} .steps li{margin:0 0 8px}
+.flow{list-style:none; counter-reset:f; padding:0; margin:0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:22px}
+.flow li{position:relative; background:var(--surface); border:1px solid var(--line); border-top:3px solid var(--ink); border-radius:8px; padding:10px 12px; font-size:13px; display:flex; flex-direction:column; gap:4px}
+.flow li strong{font-size:13.5px}
+.flow li span{color:var(--muted)}
+.flow li + li::before{content:"→"; position:absolute; left:-18px; top:50%; transform:translateY(-50%); color:var(--muted); font:600 15px var(--body)}
+@media (max-width:900px){.flow{grid-template-columns:1fr; gap:20px} .flow li + li::before{content:"↓"; left:50%; top:-19px; transform:translateX(-50%)}}
+.card.key{border-left:4px solid var(--bad)}
+.card.key p{margin:6px 0 0; font-size:14px}
+.top3row{display:grid; grid-template-columns:22px 1fr auto; gap:4px 10px; align-items:center; padding:9px 0; border-top:1px solid var(--line)}
+.top3row:first-child{border-top:0}
+.top3row .rk{font:600 13px var(--mono); color:var(--muted)}
+.top3row .nm{font-size:14px}
+.top3row .vv{font:600 14px var(--mono)}
+.top3row .cbar{grid-column:2 / -1; height:8px}
 /* Infobulles */
 .tip{display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:5px; padding:0; border:1px solid var(--line); border-radius:50%; background:var(--surface); color:var(--muted); font:600 10.5px/1 var(--body); cursor:help; vertical-align:1px}
 .tip:hover,.tip[aria-expanded="true"]{color:var(--ink); border-color:var(--muted)}
@@ -199,7 +224,7 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
 <nav class="topnav" aria-label="Sections">
   <div class="wrap navin">
     <div class="navlinks" id="navlinks">
-      <a href="#synthese">Synthèse</a><a href="#regime">Régime</a><a href="#valorisation">Valorisation</a><a href="#dynamique">Dynamique</a><a href="#historique">Historique</a><a href="#zones">Zones</a><a href="#risque">Risque</a><a href="#allocation">Allocation</a><a href="#test">Test historique</a><a href="#methode">Méthode</a><a href="#limites">Limites</a>
+      <a href="#signal">Signal du jour</a><a href="#composantes">Composantes</a><a href="#methode">Méthode</a><a href="#plus">Pour aller plus loin</a><a href="#limites">Limites</a>
     </div>
     <div class="navw"><span class="lbl" id="wlbl">Pondération</span>
       <div class="seg" role="group" aria-label="Pondération du score mondial"><button type="button" id="wcap" aria-pressed="true" title="Pondération par capitalisation boursière"><span class="lg">Capitalisation</span><span class="sh">Capi</span></button><button type="button" id="weq" aria-pressed="false" title="Pondération à parts égales">Égale</button></div></div>
@@ -207,77 +232,58 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
 </nav>
 
 <main class="wrap">
-  <p class="verdict" id="verdict" hidden></p>
   <div id="alerts"></div>
   <div id="loading">Chargement des données…</div>
 
   <div id="app" hidden>
-  <!-- SYNTHÈSE -->
-  <section id="synthese">
-    <div class="toolbar"><div><h2>Synthèse</h2><p class="sub" id="asof" style="margin:0"></p></div></div>
-    <div class="grid hero">
+
+  <!-- 1. SIGNAL DU JOUR (attendu 6) -->
+  <section id="signal">
+    <div class="eyebrow">1 · Analyse et interprétation</div>
+    <h2>Signal du jour</h2>
+    <p class="sub" id="asof"></p>
+    <div class="grid sig">
       <div class="card">
-        <div class="kicker">1 · Climat : score mondial</div>
+        <div class="kicker">Score mondial de climat<button type="button" class="tip" data-tip="score" aria-label="Définition : score de climat">?</button></div>
         <div class="row" style="justify-content:space-between; align-items:flex-end; margin-top:8px">
           <div class="bignum num" id="gScore"></div>
           <div id="gauge" style="width:156px"></div>
         </div>
         <div class="row" style="margin-top:10px"><span id="gPill"></span></div>
-        <div class="kv" style="margin-top:12px"><span>Variation sur 1 mois</span><span id="d1"></span><span>Variation sur 3 mois</span><span id="d3"></span><span>Variation sur 12 mois</span><span id="d12"></span></div>
-        <p class="phrase" id="gPhrase"></p>
+        <p class="signal" id="signalPhrase"></p>
+        <div class="kv" style="margin-top:12px"><span>Évolution sur 1 mois</span><span id="d1"></span><span>Évolution sur 3 mois</span><span id="d3"></span><span>Évolution sur 12 mois</span><span id="d12"></span></div>
         <p class="small muted" style="margin:10px 0 0" id="wNote"></p>
       </div>
       <div class="card">
-        <div class="kicker">2 · Régime et valorisation</div>
-        <div style="margin-top:12px" id="regChip"></div>
-        <p class="small" id="regText" style="margin:8px 0 12px"></p>
-        <div class="zonebar"><span class="small">Attrait actions<button type="button" class="tip" data-tip="prime" aria-label="Définition : attrait des actions et prime de risque">?</button></span><div class="track"><div class="fill" id="eqFill"></div><div class="mid"></div></div><span class="num small" id="eqVal" style="text-align:right"></span></div>
-        <div class="zonebar"><span class="small">Attrait obligations</span><div class="track"><div class="fill" id="bdFill"></div><div class="mid"></div></div><span class="num small" id="bdVal" style="text-align:right"></span></div>
-        <p class="small muted" style="margin:6px 0 0">Au-dessus de 50 : plus attractif que la moyenne historique.</p>
-      </div>
-      <div class="card">
-        <div class="kicker">3 · Lecture d'allocation</div>
-        <h3 id="aTitle" style="margin-top:10px; font-size:16px"></h3>
-        <div class="stack" id="aStackMini" aria-hidden="true"></div>
-        <p class="small" id="aText" style="margin:8px 0 0"></p>
-        <p class="small muted" style="margin:8px 0 0"><span id="aLegend"></span>. Détail dans la section Allocation.</p>
+        <h3 id="top3Title">Les trois indicateurs qui pèsent le plus aujourd'hui</h3>
+        <p class="small muted" style="margin:4px 0 10px">Contribution au niveau du score : poids × (sous-score − 50), en points.</p>
+        <div id="top3"></div>
+        <p class="small" style="margin:12px 0 0" id="implication"></p>
+        <p class="small muted" style="margin:8px 0 0"><a href="#composantes">Toutes les composantes</a> · <a href="#plus">Régime, valorisation, allocation</a></p>
       </div>
     </div>
   </section>
 
-  <!-- RÉGIME -->
-  <section id="regime">
-    <h2>Régime économique : croissance et inflation</h2>
-    <p class="sub">La même note globale peut cacher des situations opposées. Ce qui oriente l'allocation, c'est la combinaison croissance / inflation, logique du portefeuille All Weather. Les traînées montrent le chemin parcouru sur les 6 derniers mois.</p>
-    <div class="grid two">
-      <div class="card"><div class="chartbox" id="quadBox" style="height:380px"><canvas id="quad" role="img" aria-label="Position des zones et du monde dans les quatre régimes croissance et inflation, avec la trajectoire des six derniers mois"></canvas></div>
-        <div class="legend-q" id="quadLegend"></div></div>
-      <div class="card">
-        <h3>Lecture des quatre régimes</h3>
-        <div class="tablewrap" style="margin-top:8px"><table>
-          <thead><tr><th>Régime<button type="button" class="tip" data-tip="regime" aria-label="Définition : régime économique">?</button></th><th>Définition</th><th>Actifs favorisés</th></tr></thead>
-          <tbody id="regTable"></tbody></table></div>
-        <p class="small muted" style="margin:10px 0 0">Croissance : moyenne des sous-scores PIB et indicateur avancé (seuil 50). Inflation : glissement annuel (seuil 2,5 %, soit la cible de 2 % plus une marge de tolérance). Le régime mondial suit la pondération choisie dans la barre du haut.</p>
-      </div>
+  <!-- 2. COMPOSANTES DU SCORE (attendus 5 et 6) -->
+  <section id="composantes">
+    <div class="eyebrow">2 · Construction du score</div>
+    <h2>Composantes du score</h2>
+    <p class="sub">Un sous-score de 50 correspond à la moyenne des dix dernières années. Chaque indicateur tire donc le score au-dessus ou au-dessous de 50 selon son poids et son écart à cette moyenne.</p>
+    <div class="card">
+      <div class="toolbar"><div class="seg" role="group" aria-label="Périmètre des composantes" id="cpSeg"></div></div>
+      <h3 class="ctitle" id="cpTitle"></h3>
+      <div id="cpBars" style="margin-top:10px"></div>
+      <p class="small muted" style="margin:10px 0 0" id="cpNote"></p>
+      <p class="check" id="cpCheck"></p>
     </div>
-  </section>
 
-  <!-- VALORISATION -->
-  <section id="valorisation">
-    <h2>Valorisation : le climat est-il déjà dans les prix ?</h2>
-    <p class="sub">Un climat favorable coïncide souvent avec des marchés chers. Ce pilier n'entre pas dans le score de climat : il corrige l'allocation. Plus le PER de Shiller est élevé, moins la performance future tend à être bonne.</p>
-    <div class="grid three" id="valCards"></div>
-  </section>
-
-  <!-- DYNAMIQUE -->
-  <section id="dynamique">
-    <h2>Dynamique : ce qui fait bouger le score</h2>
+    <h3 class="subh" id="dynamique">Ce qui a fait bouger le score</h3>
     <div class="toolbar">
       <div class="seg" role="group" aria-label="Horizon" id="hzSeg"></div>
       <div class="seg" role="group" aria-label="Périmètre" id="scSeg"></div>
     </div>
     <div class="grid two">
-      <div class="card"><p class="lead" id="dynText" style="margin:0 0 12px"></p><div id="contribs"></div>
+      <div class="card"><p class="lead ctitle" id="dynText" style="margin:0 0 12px"></p><div id="contribs"></div>
         <p class="small muted" style="margin:10px 0 0" id="dynNote"></p><p class="check" id="dynCheck"></p></div>
       <div class="card">
         <h3>Variations par zone</h3>
@@ -287,40 +293,158 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
         <p class="small muted" style="margin:10px 0 0">Un même niveau n'appelle pas la même décision selon qu'il monte ou qu'il baisse : la tendance se lit à côté du niveau.</p>
       </div>
     </div>
-  </section>
 
-  <!-- HISTORIQUE -->
-  <section id="historique">
-    <h2>Évolution du score depuis 2016</h2>
-    <p class="sub">Scores mensuels ; bandes grisées : épisodes de crise ; pointillés : seuils 40 et 60. Le ruban sous le graphique indique le régime mondial de chaque mois.</p>
+    <h3 class="subh" id="historique">Suivi du score depuis 2016</h3>
     <div class="card">
+      <h3 class="ctitle" id="histTitle"></h3>
+      <p class="small muted" style="margin:4px 0 10px">Scores mensuels ; bandes grisées : épisodes de crise ; pointillés : seuils 40 et 60 ; ruban : régime mondial de chaque mois.</p>
       <div class="legend" id="legend" role="group" aria-label="Séries affichées"></div>
       <div class="chartbox" id="histBox" style="height:380px"><canvas id="hist" role="img" aria-label="Évolution mensuelle des scores de climat depuis janvier 2016 et ruban du régime mondial"></canvas></div>
     </div>
-  </section>
 
-  <!-- ZONES -->
-  <section id="zones">
-    <h2>Détail par zone</h2>
-    <p class="sub">Sous-scores de 0 à 100 ; le trait central marque la moyenne des 10 dernières années (50). Valeur brute du mois de référence entre parenthèses, puis date de la dernière donnée publiée par la source.</p>
+    <h3 class="subh" id="zones">Détail par zone</h3>
     <details class="fold" id="foldZones"><summary>Sous-scores et sources des trois zones <span class="muted" id="zonesSum"></span></summary>
+      <p class="small muted foldbody" style="margin-bottom:0">Sous-scores de 0 à 100 ; le trait central marque la moyenne des 10 dernières années (50). Valeur brute du mois de référence entre parenthèses, puis date de la dernière donnée publiée.</p>
       <div class="foldbody grid zones" id="zoneCards"></div></details>
   </section>
 
-  <!-- RISQUE -->
-  <section id="risque">
-    <h2>Socle mondial de risque</h2>
-    <p class="sub">Quatre indicateurs communs aux trois zones (5 % chacun, 20 % de chaque score de zone), notés de façon inversée : plus la tension est forte, plus le sous-score est bas.</p>
-    <div class="grid risk" id="riskCards"></div>
+  <!-- 3. MÉTHODE (attendus 1 à 5) -->
+  <section id="methode">
+    <div class="eyebrow">3 · Méthode</div>
+    <h2>Méthode</h2>
+    <p class="sub">De la donnée brute au score : indicateurs, sources, collecte, normalisation, pondération.</p>
+
+    <div class="mblock">
+      <h3 class="mh"><span class="mn">1</span>Indicateurs</h3>
+      <p class="small" id="indSum" style="margin:0 0 10px"></p>
+      <div class="card"><div class="tablewrap"><table>
+        <thead><tr><th>Famille</th><th>Indicateur retenu</th><th>Catégorie du sujet</th><th class="n">Poids</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2"><span class="fam">Croissance</span></td><td>Croissance du PIB réel (glissement annuel)</td><td>PIB</td><td class="n">15 %</td></tr>
+          <tr><td>Indicateur avancé de l'OCDE (CLI)<button type="button" class="tip" data-tip="cli" aria-label="Définition : CLI">?</button></td><td class="muted">Hors liste : complète le PIB, publié avec retard</td><td class="n">15 %</td></tr>
+          <tr><td><span class="fam">Inflation</span></td><td>Écart de l'inflation à la cible de 2 %</td><td>Inflation</td><td class="n">20 %</td></tr>
+          <tr><td rowspan="2"><span class="fam">Marchés financiers</span></td><td>Tendance actions (cours / moyenne 12 mois)</td><td>Indices boursiers</td><td class="n">15 %</td></tr>
+          <tr><td>Pente des taux 10 ans − 3 mois<button type="button" class="tip" data-tip="pente" aria-label="Définition : pente des taux">?</button></td><td>Taux</td><td class="n">15 %</td></tr>
+          <tr><td rowspan="4"><span class="fam">Risque (socle mondial)</span></td><td>VIX<button type="button" class="tip" data-tip="vix" aria-label="Définition : VIX">?</button></td><td>Volatilité</td><td class="n">5 %</td></tr>
+          <tr><td>Spread de crédit Baa<button type="button" class="tip" data-tip="spread" aria-label="Définition : spread de crédit">?</button></td><td>Indices de risque</td><td class="n">5 %</td></tr>
+          <tr><td>Risque géopolitique (GPR)<button type="button" class="tip" data-tip="gpr" aria-label="Définition : indice GPR">?</button></td><td>Indices de risque / incertitude</td><td class="n">5 %</td></tr>
+          <tr><td>Choc pétrolier (Brent / moyenne 12 mois)</td><td>Matières premières</td><td class="n">5 %</td></tr>
+          <tr><td class="muted">Non retenue</td><td class="muted">—</td><td>Flux de capitaux</td><td class="n muted">0 %</td></tr>
+        </tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0">Hors score, pour la valorisation : PER de Shiller<button type="button" class="tip" data-tip="cape" aria-label="Définition : CAPE">?</button>, taux réel 10 ans américain (TIPS<button type="button" class="tip" data-tip="tips" aria-label="Définition : TIPS">?</button>) et taux 10 ans de la zone euro et du Japon.</p></div>
+    </div>
+
+    <div class="mblock">
+      <h3 class="mh"><span class="mn">2</span>Sources</h3>
+      <div class="card">
+        <p class="small muted" style="margin:0 0 8px" id="srcNote"></p>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Groupe</th><th>Série</th><th>Source</th><th class="n">Dernière valeur</th><th>Dernière donnée</th><th>Statut</th></tr></thead>
+          <tbody id="srcTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="mblock">
+      <h3 class="mh"><span class="mn">3</span>Collecte</h3>
+      <p class="small" style="margin:0 0 10px">Entièrement automatique, en Python, sans clé d'API exposée.</p>
+      <ol class="flow" aria-label="Circuit de collecte">
+        <li><strong>Sources ouvertes</strong><span>FRED, OCDE, BCE, Eurostat, DBnomics, Shiller, Caldara et Iacoviello</span></li>
+        <li><strong>GitHub Actions, chaque jour à 6 h UTC</strong><span>Lance <code>collect.py</code> (pandas) : téléchargement, passage en mensuel, calcul des scores</span></li>
+        <li><strong>Contrôle</strong><span>Tests : la somme des contributions doit égaler la variation du score</span></li>
+        <li><strong>Enregistrement de data.json</strong><span>Commit automatique dans le dépôt GitHub</span></li>
+        <li><strong>Publication par Netlify</strong><span>Le site est republié ; la page lit data.json dans le navigateur</span></li>
+      </ol>
+      <p class="small muted" style="margin:10px 0 0">Si une source ne répond pas, la dernière valeur connue est conservée et signalée en tête de page ; le site reste consultable. GitHub peut décaler l'exécution de quelques minutes.</p>
+    </div>
+
+    <div class="mblock">
+      <h3 class="mh"><span class="mn">4</span>Normalisation</h3>
+      <div class="grid method">
+        <div class="card">
+          <ol class="small steps">
+            <li><strong>Mensualisation.</strong> Chaque série est ramenée à sa dernière valeur connue du mois ; le PIB trimestriel est placé sur le dernier mois du trimestre.</li>
+            <li><strong>Z-score sur 10 ans glissants</strong><button type="button" class="tip" data-tip="zscore" aria-label="Définition : Z-score">?</button> : <code>z = (valeur − moyenne des 120 derniers mois) / écart-type</code>, avec au moins 36 mois d'historique.</li>
+            <li><strong>Écrêtage à ±3</strong>, puis conversion sur 0-100 : <code>score = (z + 3) / 6 × 100</code>. 50 correspond à la moyenne des dix dernières années.</li>
+            <li><strong>Inversion pour le risque.</strong> VIX, spread de crédit, risque géopolitique et écart du Brent à sa moyenne sont pris avec un signe négatif : plus la tension monte, plus le sous-score baisse.</li>
+            <li><strong>Cible pour l'inflation.</strong> L'indicateur est l'écart absolu de l'inflation à 2 % (cible des banques centrales), inversé : 1 % ou 3 % d'inflation sont jugés aussi éloignés de la cible.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Pourquoi le Z-score plutôt que le Min-Max</h3>
+          <ul class="small" style="padding-left:18px; margin:8px 0 0">
+            <li>Le Min-Max<button type="button" class="tip" data-tip="minmax" aria-label="Définition : Min-Max">?</button> dépend des deux seuls extrêmes de la période : un pic isolé (VIX en 2008 ou en 2020) écrase toutes les autres valeurs vers le bas de l'échelle, et l'échelle change à chaque nouveau record.</li>
+            <li>Le Z-score exprime chaque valeur en écarts-types par rapport à sa moyenne : des séries d'unités différentes (%, points, indice) deviennent comparables, et l'écrêtage à ±3 borne l'effet des crises.</li>
+            <li>La fenêtre de 10 ans glissants mesure le climat « au regard du passé récent » ; elle est imposée par la série la plus courte (S&amp;P 500 sur FRED).</li>
+          </ul>
+          <p class="small" style="margin:12px 0 0" id="zExample"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mblock">
+      <h3 class="mh"><span class="mn">5</span>Pondération</h3>
+      <div class="grid method">
+        <div class="card">
+          <h3>Poids par indicateur (score de chaque zone)</h3>
+          <div class="tablewrap" style="margin-top:8px"><table class="compact">
+            <thead><tr><th>Niveau</th><th class="n">Poids</th><th>Justification</th></tr></thead>
+            <tbody>
+              <tr><td>Familles : croissance, inflation, marchés, risque</td><td class="n">30 / 20 / 30 / 20</td><td>Grille d'exemple du cours (séance 1, slides 4 et 5), reprise par la note de cadrage (section 4).</td></tr>
+              <tr><td>Regroupement par famille</td><td class="n">—</td><td>Neutralise la double comptabilisation d'indicateurs corrélés (VIX et spread, PIB et indicateur avancé) : note, section 8.</td></tr>
+              <tr><td>Risque : socle commun aux trois zones</td><td class="n">20 %</td><td>Le risque est traité comme mondial et entre pour 20 % dans chaque score de zone (note, section 3).</td></tr>
+              <tr><td>Partage égal dans chaque famille : PIB et CLI, actions et pente</td><td class="n">15 + 15</td><td class="todo">Justification à compléter (la note fixe ces poids sans les justifier).</td></tr>
+              <tr><td>Partage égal du socle : VIX, spread, GPR, Brent</td><td class="n">4 × 5</td><td class="todo">Justification à compléter (la note fixe ces poids sans les justifier).</td></tr>
+            </tbody></table></div>
+          <p class="small muted" style="margin:10px 0 0"><code>Score de zone = Σ poids × sous-score</code> : 80 % d'indicateurs de la zone, 20 % de socle de risque.</p>
+        </div>
+        <div class="card">
+          <h3>Poids par zone (score mondial)</h3>
+          <div class="tablewrap" style="margin-top:8px"><table class="compact">
+            <thead><tr><th>Pondération</th><th class="n">É.-U. / ZE / Japon</th><th>Justification</th></tr></thead>
+            <tbody>
+              <tr><td>Capitalisation (par défaut)<button type="button" class="tip" data-tip="capi" aria-label="Définition : pondération par capitalisation">?</button></td><td class="n" id="wCapi"></td><td>Lecture financière, pertinente pour un investisseur : poids MSCI ACWI (États-Unis, Japon) et MSCI EMU renormalisés sur les trois zones (note, section 5.4), à mettre à jour chaque trimestre.</td></tr>
+              <tr><td>Parts égales</td><td class="n">33 / 33 / 33</td><td>Lecture économique : évite que le score mondial ne soit presque un score américain (note, section 5.4).</td></tr>
+            </tbody></table></div>
+          <p class="small muted" style="margin:10px 0 0"><code>Score mondial = Σ poids de zone × score de zone</code>. Le sélecteur de la barre du haut bascule toute la page d'une pondération à l'autre.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- ALLOCATION -->
-  <section id="allocation">
-    <h2>Lecture d'allocation en trois étapes</h2>
-    <p class="sub">Le régime fixe la base, le climat règle le niveau de risque, la valorisation corrige les excès de prix. Seuils et répartitions fixés a priori, non optimisés sur le passé.</p>
+  <!-- 4. POUR ALLER PLUS LOIN -->
+  <section id="plus">
+    <div class="eyebrow">4 · Du score à la décision</div>
+    <h2>Pour aller plus loin</h2>
+    <p class="sub">Le score décrit le climat. Pour orienter une allocation, il faut aussi le régime économique, le niveau des prix et des règles explicites, testées sur le passé.</p>
+
+    <h3 class="subh" id="regime">Régime économique : croissance et inflation<button type="button" class="tip" data-tip="regime" aria-label="Définition : régime économique">?</button></h3>
+    <p class="sub">La même note globale peut cacher des situations opposées. Ce qui oriente l'allocation, c'est la combinaison croissance / inflation, logique du portefeuille All Weather.</p>
+    <div class="grid two">
+      <div class="card"><h3 class="ctitle" id="quadTitle"></h3><div class="chartbox" id="quadBox" style="height:380px; margin-top:8px"><canvas id="quad" role="img" aria-label="Position des zones et du monde dans les quatre régimes croissance et inflation, avec la trajectoire des six derniers mois"></canvas></div>
+        <div class="legend-q" id="quadLegend"></div></div>
+      <div class="card">
+        <h3>Lecture des quatre régimes</h3>
+        <div class="tablewrap" style="margin-top:8px"><table>
+          <thead><tr><th>Régime</th><th>Définition</th><th>Actifs favorisés</th></tr></thead>
+          <tbody id="regTable"></tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0">Croissance : moyenne des sous-scores PIB et indicateur avancé (seuil 50). Inflation : glissement annuel (seuil 2,5 %, soit la cible de 2 % plus une marge de tolérance). Le régime mondial suit la pondération choisie dans la barre du haut.</p>
+      </div>
+    </div>
+
+    <h3 class="subh" id="valorisation">Valorisation : le climat est-il déjà dans les prix ?</h3>
+    <p class="sub">Un climat favorable coïncide souvent avec des marchés chers. Ce pilier n'entre pas dans le score : il corrige l'allocation. Z-score sur l'historique long, car les cycles de valorisation durent plusieurs décennies.</p>
+    <div class="grid three" id="valCards"></div>
+
+    <h3 class="subh" id="risque">Socle mondial de risque</h3>
+    <p class="sub">Quatre indicateurs communs aux trois zones (5 % chacun, 20 % de chaque score de zone), notés de façon inversée : plus la tension est forte, plus le sous-score est bas.</p>
+    <div class="grid risk" id="riskCards"></div>
+
+    <h3 class="subh" id="allocation">Lecture d'allocation en trois étapes</h3>
+    <p class="sub">Le régime fixe la base ; le climat règle le niveau de risque (score &lt; 40 : actions −10 points vers les liquidités ; ≥ 60 : +5) ; la valorisation corrige les excès de prix (attrait actions &lt; 35 : −10 points vers les obligations si leur attrait atteint 50, sinon vers les liquidités ; &gt; 65 : +5). Seuils fixés a priori.</p>
     <div class="grid alloc">
       <div class="card">
-        <div class="tablewrap"><table>
+        <h3 class="ctitle" id="allocTitle2"></h3>
+        <div class="tablewrap" style="margin-top:8px"><table>
           <thead><tr><th>Étape</th><th class="n">Actions</th><th class="n">Oblig. d'État</th><th class="n">Actifs réels</th><th class="n">Liquidités</th></tr></thead>
           <tbody id="steps"></tbody></table></div>
         <div class="small" style="margin-top:14px">Référence du cours (60 / 40)</div><div class="stack" id="stackRef"></div>
@@ -335,11 +459,8 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
         <p class="small muted" style="margin:10px 0 0" id="rankNote"></p>
       </div>
     </div>
-  </section>
 
-  <!-- TEST HISTORIQUE -->
-  <section id="test">
-    <h2>Test historique : 2008, 2020, 2022 face au 60 / 40</h2>
+    <h3 class="subh" id="test">Test historique : 2008, 2020, 2022 face au 60 / 40</h3>
     <p class="sub">Que serait-il advenu si l'on avait suivi les règles du baromètre pendant trois crises récentes ? Chaque mois, l'allocation est décidée avec les données de fin du mois précédent, puis comparée à l'allocation de référence du cours : 60 % actions, 40 % obligations d'État.</p>
     <div class="notice" style="margin:0 0 16px"><strong>Illustration, pas une preuve.</strong> Trois épisodes ne constituent pas un échantillon : un écart favorable ou défavorable peut tenir au hasard du calendrier. Les données utilisées sont celles connues aujourd'hui (révisions et retards de publication ignorés, PIB notamment), ce qui avantage le baromètre. Les seuils n'ont pas été ajustés pour améliorer ce test.</div>
     <div class="toolbar"><span class="lbl" id="thlbl">Changement de régime</span><div class="seg" role="group" aria-labelledby="thlbl" id="thSeg"></div><span class="small muted">Pondération : celle choisie dans la barre du haut.</span></div>
@@ -369,65 +490,26 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
     </details>
   </section>
 
-  <!-- MÉTHODE -->
-  <section id="methode">
-    <h2>Méthode et sources</h2>
-    <p class="sub">Pondérations, normalisation et règles d'allocation ; liste des séries avec la date de leur dernière donnée.</p>
-    <details class="fold"><summary>Méthode de calcul <span class="muted">poids, normalisation, règles</span></summary>
-    <div class="foldbody grid method">
-      <div class="card">
-        <h3>Score de climat (par zone)</h3>
-        <div class="tablewrap" style="margin-top:8px"><table>
-          <thead><tr><th>Famille</th><th>Indicateur</th><th class="n">Poids</th></tr></thead>
-          <tbody>
-            <tr><td rowspan="2">Croissance</td><td>Croissance du PIB réel (glissement annuel)</td><td class="n">15 %</td></tr>
-            <tr><td>Indicateur avancé de l'OCDE (CLI)</td><td class="n">15 %</td></tr>
-            <tr><td>Inflation</td><td>Écart absolu à la cible de 2 %</td><td class="n">20 %</td></tr>
-            <tr><td rowspan="2">Marchés</td><td>Tendance actions (cours / moyenne 12 mois)</td><td class="n">15 %</td></tr>
-            <tr><td>Pente 10 ans moins 3 mois</td><td class="n">15 %</td></tr>
-            <tr><td>Risque mondial</td><td>VIX, spread Baa, géopolitique, Brent</td><td class="n">4 × 5 %</td></tr>
-          </tbody></table></div>
-        <p class="small muted" style="margin:10px 0 0" id="capNote"></p>
-      </div>
-      <div class="card">
-        <h3>Normalisation et règles</h3>
-        <ol class="small" style="padding-left:18px; margin:8px 0 0">
-          <li>Séries ramenées en mensuel (dernière valeur connue du mois).</li>
-          <li>Climat : Z-score sur 10 ans glissants, écrêté à ±3, converti en <code>s = (z + 3) / 6 × 100</code> ; inversion pour le risque ; écart absolu à 2 % pour l'inflation, inversé.</li>
-          <li>Valorisation : Z-score sur l'historique long disponible. Actions : 1 / PER de Shiller moins taux réel 10 ans américain. Obligations : taux réel 10 ans par zone.</li>
-          <li>Régime : croissance (moyenne des sous-scores PIB et CLI, seuil 50) × inflation (seuil 2,5 %). Bases A / O / R / L : expansion 65 / 25 / 5 / 5, surchauffe 50 / 10 / 30 / 10, ralentissement 35 / 50 / 5 / 10, stagflation 30 / 15 / 30 / 25.</li>
-          <li>Allocation : climat &lt; 40 : actions −10 vers liquidités ; ≥ 60 : actions +5 (pris sur les liquidités, puis sur les obligations). Attrait actions &lt; 35 : actions −10 vers obligations si leur attrait ≥ 50, sinon vers liquidités ; &gt; 65 : actions +5.</li>
-          <li>Contributions : poids de la zone × poids de l'indicateur × variation du sous-score ; leur somme égale la variation du score (contrôle affiché dans la section Dynamique).</li>
-        </ol>
-      </div>
-    </div>
-    </details>
-    <details class="fold"><summary>Sources et fraîcheur des séries <span class="muted" id="srcSum"></span></summary>
-    <div class="foldbody card">
-      <p class="small muted" style="margin:0 0 8px" id="srcNote"></p>
-      <div class="tablewrap"><table>
-        <thead><tr><th>Groupe</th><th>Série</th><th>Source</th><th class="n">Dernière valeur</th><th>Dernière donnée</th><th>Statut</th></tr></thead>
-        <tbody id="srcTable"></tbody></table></div>
-    </div>
-    </details>
-  </section>
-
-  <!-- LIMITES -->
+  <!-- 5. LIMITES -->
   <section id="limites">
+    <div class="eyebrow">5 · Limites</div>
     <h2>Limites</h2>
     <p class="sub">Ce site est un exercice pédagogique. Il décrit un climat et des niveaux de prix ; il ne constitue pas une recommandation d'investissement.</p>
-    <div class="grid limits">
+    <div class="card key">
+      <h3>Flux de capitaux absents : la seule catégorie du sujet non couverte</h3>
+      <p>Le sujet cite les flux de capitaux parmi les indicateurs possibles. Les séries de référence sont payantes : aucune source gratuite et automatisable n'a été retenue. Le baromètre couvre les sept autres catégories, mais ne voit pas les mouvements d'argent entre zones et classes d'actifs, qui peuvent précéder ou amplifier les variations de marché.</p>
+    </div>
+    <div class="grid limits" style="margin-top:16px">
       <div class="card"><h3>Chine exclue</h3><p>Aucune source gratuite et automatisable n'a été trouvée pour trois des quatre indicateurs de zone chinois. Le Japon la remplace ; la Chine reste présente via l'indice de risque géopolitique.</p></div>
       <div class="card"><h3>Valorisation actions : États-Unis seulement</h3><p>Pas de PER de Shiller en accès libre pour la zone euro et le Japon. L'attrait des actions repose sur le marché américain, qui pèse environ 84 % de la capitalisation des trois zones.</p></div>
       <div class="card"><h3>Seuils fixés a priori</h3><p>Les seuils (40, 60, 35, 65, 2,5 %) et les répartitions par régime sont posés a priori et non calibrés sur le passé : les optimiser rendrait tout test historique trompeur. Une zone proche d'un seuil peut changer de régime d'un mois à l'autre.</p></div>
-      <div class="card"><h3>Flux de capitaux absents</h3><p>Cités par le sujet, mais les séries de référence sont payantes. Leur absence est assumée.</p></div>
       <div class="card"><h3>Corrélation n'est pas causalité</h3><p>Le baromètre ne prédit pas les rendements. Les corrélations entre classes d'actifs montent en période de crise : la diversification protège moins quand on en a le plus besoin.</p></div>
       <div class="card"><h3>Retards et doubles comptes</h3><p>Les sources publient avec retard (PIB trimestriel notamment) : la date de la dernière donnée de chaque série est affichée. VIX et spread, PIB et CLI sont corrélés ; la pondération par famille limite cet effet.</p></div>
     </div>
   </section>
 
   <footer id="foot">
-    Projet pédagogique KEDGE BS, cours « Gestion d'actifs et de portefeuille ». Données publiques collectées automatiquement chaque jour (FRED, OCDE, BCE, Eurostat, Shiller, Caldara et Iacoviello). Ne constitue pas un conseil en investissement.
+    Projet pédagogique KEDGE BS, cours « Gestion d'actifs et de portefeuille ». Données publiques collectées automatiquement chaque jour (FRED, OCDE, BCE, Eurostat, Shiller, Caldara et Iacoviello). Ne constitue pas un conseil en investissement. <a href="v1.html">Version précédente de la page</a>.
   </footer>
   </div>
 </main>
@@ -460,6 +542,15 @@ var TIPS = {
   cape:"PER de Shiller (CAPE) : cours du S&P 500 divisé par la moyenne des bénéfices des dix dernières années, corrigés de l'inflation. Plus il est élevé, plus les actions américaines sont chères au regard de leurs résultats.",
   tips:"TIPS (Treasury Inflation-Protected Securities) : obligations d'État américaines indexées sur l'inflation. Leur rendement à 10 ans (série FRED DFII10) mesure le taux d'intérêt réel, c'est-à-dire au-delà de l'inflation.",
   prime:"Prime de risque des actions : rendement bénéficiaire (1 / PER de Shiller) moins taux réel 10 ans (TIPS). C'est le supplément de rendement offert par les actions ; faible ou négative, elle signale des actions chères. L'attrait des actions (0-100) situe cette prime par rapport à son historique.",
+  score:"Score de climat : moyenne pondérée de 9 sous-scores de 0 à 100. 50 correspond à la moyenne des dix dernières années ; au-dessus de 60 le climat est jugé favorable, au-dessous de 40 dégradé.",
+  cli:"CLI (Composite Leading Indicator) : indicateur avancé de l'OCDE, construit pour anticiper de 6 à 9 mois les retournements de l'activité. Il complète le PIB, publié avec retard.",
+  pente:"Pente des taux : taux à 10 ans moins taux à 3 mois. Une pente négative (courbe inversée) a souvent précédé les récessions ; une pente positive accompagne en général l'expansion.",
+  vix:"VIX : volatilité implicite à 30 jours du S&P 500, tirée des prix d'options. Souvent appelé « indice de la peur » ; il monte quand les investisseurs se couvrent.",
+  spread:"Spread de crédit : écart de rendement entre les obligations d'entreprises notées Baa par Moody's et le taux d'État américain à 10 ans. Il s'élargit quand le risque de défaut perçu augmente.",
+  gpr:"GPR (Geopolitical Risk Index) : indice de Caldara et Iacoviello qui mesure la fréquence des articles de presse consacrés aux tensions géopolitiques (guerres, menaces, terrorisme).",
+  zscore:"Z-score : écart d'une valeur à sa moyenne, exprimé en nombre d'écarts-types. z = 0 : valeur égale à la moyenne ; z = 2 : valeur nettement au-dessus.",
+  minmax:"Min-Max : (valeur − minimum) / (maximum − minimum), ce qui ramène la série entre 0 et 1 en fonction de ses deux extrêmes.",
+  capi:"Pondération par capitalisation : chaque zone pèse selon la taille de son marché d'actions. Les États-Unis représentent environ 84 % des trois zones.",
   regime:"Régime économique : combinaison de la croissance et de l'inflation. Croissance forte si la moyenne des sous-scores PIB et indicateur avancé atteint 50 ; inflation élevée si le glissement annuel atteint 2,5 %. Quatre cas : expansion, surchauffe, ralentissement, stagflation. Le régime fixe l'allocation de base."
 };
 function tip(k,nom){return '<button type="button" class="tip" data-tip="'+k+'" aria-label="Définition : '+nom+'">?</button>';}
@@ -496,7 +587,7 @@ var AK = ["A","O","R","L"];
 /* ================= Utilitaires ================= */
 function fx(v,d){if(v===null||v===undefined||isNaN(v)) return "n.d."; return Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d}).replace(/^-/,"−");}
 /* Textes venus de data.json : vrai signe moins et « zone euro » en minuscule en milieu de phrase */
-function typo(s){return String(s).replace(/ - /g," − ").replace(/(^|[\s(])-(?=\d)/g,"$1−").replace(/\(Zone euro\)/g,"(zone euro)");}
+function typo(s){return String(s).replace(/ - /g," − ").replace(/(^|[\s(])-(?=\d)/g,"$1−").replace(/\(Zone euro\)/g,"(zone euro)").replace(/(\d) %/g,"$1\u00a0%");}
 function sg(v,d){if(v===null||v===undefined||isNaN(v)) return "n.d."; var r=Math.abs(v)<0.5*Math.pow(10,-d); return r? fx(0,d) : (v>0?"+":"−")+fx(Math.abs(v),d);}
 function pts(v){return Math.abs(v)<2?"point":"points";}
 function esc(s){return typo(s===null||s===undefined?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
@@ -562,7 +653,8 @@ function init(){
   }
   $("wcap").addEventListener("click",function(){setMode("capi");});
   $("weq").addEventListener("click",function(){setMode("egal");});
-  seg("hzSeg",[[1,"1 mois"],[3,"3 mois"],[12,"12 mois"],["lvl","Niveau"]],3,function(v){hz=v; renderDyn();});
+  seg("hzSeg",[[1,"1 mois"],[3,"3 mois"],[12,"12 mois"]],3,function(v){hz=v; renderDyn();});
+  seg("cpSeg",[["w","Monde"],["us","États-Unis"],["ez","Zone euro"],["jp","Japon"]],"w",function(v){cpScope=v; renderComposantes();});
   seg("scSeg",[["w","Monde"],["us","États-Unis"],["ez","Zone euro"],["jp","Japon"]],"w",function(v){scope=v; renderDyn();});
   seg("thSeg",[["brut","Changement immédiat"],["confirme","Confirmé sur 2 mois"]],"brut",function(v){regMode=v; renderTest();});
   renderStatic();
@@ -572,7 +664,7 @@ function init(){
   if(mq&&mq.addEventListener) mq.addEventListener("change",function(){renderQuad(); renderHist(); renderTest();});
 }
 function setMode(m){mode=m; $("wcap").setAttribute("aria-pressed",String(m==="capi")); $("weq").setAttribute("aria-pressed",String(m==="egal")); all();}
-function all(){G=D.monde[mode]; renderSummary(); renderQuad(); renderDyn(); renderHist(); renderAlloc(); renderValBond(); renderTest();}
+function all(){G=D.monde[mode]; renderSummary(); renderComposantes(); renderQuad(); renderDyn(); renderHist(); renderAlloc(); renderValBond(); renderTest();}
 function renderStatic(){renderVal(); renderZones(); renderRisk(); renderSources();}
 
 /* ================= Alertes ================= */
@@ -595,13 +687,18 @@ function contribs(h,sc){
     return {label:lab, v:c.contribution, zone:c.zone, ind:c.indicateur};});
 }
 function target(h,sc){var b=bloc(sc); return h==="lvl"? b.niveau.ecart_a_50 : b.variations[h+"m"].variation;}
+function nomInd(c,avecZone){var x=ART[c.ind]||low1(c.label); if(avecZone&&ZLOC[c.zone]) x+=" "+ZLOC[c.zone]; return x;}
+function de(x){return /^le /.test(x)?"du "+x.slice(3):"de "+x;}
+function a(x){return /^le /.test(x)?"au "+x.slice(3):"à "+x;}
+/* Contributions au niveau regroupées par indicateur (monde : somme des trois zones) */
+function niveauParIndicateur(sc){var b=bloc(sc), o={}, ordre=[];
+  (b.niveau.contributions||[]).forEach(function(c){if(!(c.indicateur in o)){o[c.indicateur]=0; ordre.push(c.indicateur);} o[c.indicateur]+=c.contribution;});
+  return ordre.map(function(k){return {ind:k, label:D.libelles.indicateurs[k]||k, v:o[k], ss:sc==="w"?null:b.sous_scores[k]};});}
 function phrase(h,sc){
   var cs=contribs(h,sc), b=bloc(sc), name= sc==="w"?"le score mondial":"le score "+ZDE[sc];
   var sorted=cs.slice().sort(function(a,c){return Math.abs(c.v)-Math.abs(a.v);});
   var up=sorted.filter(function(c){return c.v>=0.05;}), dn=sorted.filter(function(c){return c.v<=-0.05;});
-  function nm(c){var x=ART[c.ind]||low1(c.label); if(sc==="w"&&ZLOC[c.zone]) x+=" "+ZLOC[c.zone]; return x+" ("+sg(c.v,1)+")";}
-  function de(x){return /^le /.test(x)?"du "+x.slice(3):"de "+x;}
-  function a(x){return /^le /.test(x)?"au "+x.slice(3):"à "+x;}
+  function nm(c){return nomInd(c,sc==="w")+" ("+sg(c.v,1)+")";}
   var S=up[0], F=dn[0], t;
   var soutien="principal soutien : "+(S?nm(S):"aucun"), frein="principal frein : "+(F?nm(F):"aucun");
   if(h==="lvl"){var e=b.niveau.ecart_a_50;
@@ -614,43 +711,33 @@ function phrase(h,sc){
   return {text:t, cs:cs, sorted:sorted};
 }
 
-/* ================= Synthèse ================= */
+/* ================= 1. Signal du jour ================= */
 function renderSummary(){
-  $("asof").textContent="Mois de référence : "+mlong(M)+" · collecte du "+new Date(D.genere_le).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+".";
+  $("asof").textContent="Mois de référence : "+mlong(M)+" · données collectées le "+new Date(D.genere_le).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+".";
   var g=G.score, st=state(g);
   $("gScore").innerHTML=fx(g,1)+"<small>/100</small>";
   $("gPill").innerHTML='<span class="pill '+st.c+'">Climat '+st.t.toLowerCase()+'</span>';
   [1,3,12].forEach(function(h){var d=G.variations[h+"m"].variation, e=$("d"+h); e.textContent=sg(d,1)+" pt"; e.className=dcls(d);});
-  $("gPhrase").innerHTML=phrase(3,"w").text;
+  $("signalPhrase").innerHTML=signalPhrase();
   var pz=D.parametres.ponderations.capi;
   $("wNote").textContent= mode==="capi" ? "Pondération par capitalisation : États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ez*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %. Le score mondial reflète surtout les États-Unis." : "Pondération égale : chaque zone compte pour un tiers. Lecture plus économique que financière.";
   drawGauge($("gauge"),g);
-  var r=REG[G.regime];
-  $("regChip").innerHTML='<span class="regime-chip"><i style="background:var('+r.col+')"></i>Régime mondial : '+G.regime+'</span>'+tip("regime","régime économique");
-  $("regText").innerHTML=r.def+" (croissance "+fx(G.croissance,0)+"/100, inflation "+fx(G.inflation,1)+" %). Actifs favorisés : <strong>"+r.assets.toLowerCase()+"</strong>."+(G.regime_confirme&&G.regime_confirme!==G.regime?' <span class="muted">Régime confirmé sur deux mois : '+G.regime_confirme+'.</span>':'');
-  setBar("eq",D.valorisation.attrait_actions); setBar("bd",D.valorisation.attrait_obligations[mode]);
-  var a=arr(G.allocation.brut.finale);
-  $("aTitle").textContent=allocTitle(a);
-  stack("aStackMini",a,true);
-  $("aLegend").innerHTML=["Actions","Obligations","Actifs réels","Liquidités"].map(function(n,i){return '<span style="white-space:nowrap"><i class="sw" style="background:'+COL[i]+'"></i>'+n+' '+a[i]+' %</span>';}).join(" ");
-  var pg=D.preference_geographique||[];
-  if(pg.length) $("aText").innerHTML="Zone à privilégier : <strong>"+esc(zl(pg[0].zone))+"</strong>. Zone la plus fragile : <strong>"+esc(zl(pg[pg.length-1].zone))+"</strong>.";
-  renderVerdict(a);
+  /* Les trois indicateurs qui pèsent le plus : contribution au niveau la plus forte en valeur absolue */
+  var top=niveauParIndicateur("w").sort(function(x,y){return Math.abs(y.v)-Math.abs(x.v);}).slice(0,3), mx=Math.abs(top[0]?top[0].v:1)||1;
+  $("top3").innerHTML=top.map(function(c,i){var pos=c.v>=0, w=Math.abs(c.v)/mx*50;
+    return '<div class="top3row"><span class="rk">'+(i+1)+'</span><span class="nm">'+esc(c.label)+' <span class="small muted">'+(pos?"soutient":"pèse sur")+' le score</span></span><span class="vv '+dcls(c.v)+'">'+sg(c.v,1)+' pt</span><div class="cbar"><div class="axis"></div><div class="b" style="'+(pos?'left:50%':'right:50%')+';width:'+w+'%;background:var(--'+(pos?'good':'bad')+')"></div></div></div>';}).join("");
+  var a_=arr(G.allocation.brut.finale), e=D.valorisation.attrait_actions, pg=D.preference_geographique||[];
+  $("implication").innerHTML="<strong>Ce que cela implique.</strong> Régime de "+G.regime.toLowerCase()+tip("regime","régime économique")+", actions "+(e<35?"chères":e>65?"bon marché":"à prix normal")+" (attrait "+fx(e,0)+"/100) : la lecture d'allocation retient <strong>"+a_[0]+" % d'actions</strong>, contre 60 % dans le 60/40"+(pg.length?" ; zone à privilégier : "+esc(zl(pg[0].zone)):"")+".";
 }
-/* Bandeau verdict : une ligne générée à partir des données */
-function renderVerdict(a){
-  var V=D.valorisation, e=V.attrait_actions, d3=G.variations["3m"].variation, r=REG[G.regime], ecart=a[0]-60;
-  var val= e<35?"actions chères" : e>65?"actions bon marché" : "actions à prix normal";
-  var parts=[
-    "<strong>"+cap1(mlong(M))+"</strong>",
-    "Climat "+state(G.score).t.toLowerCase()+" <span class='num'>"+fx(G.score,1)+"</span> ("+sg(d3,1)+" pt sur 3 mois)",
-    "<span class='dot' style='background:var("+r.col+")'></span>"+G.regime,
-    cap1(val)+" ("+fx(e,0)+"/100)",
-    "<strong>Actions "+a[0]+" %</strong> contre 60 % au 60/40"+(ecart?" ("+sg(ecart,0)+" pt)":"")];
-  var el_=$("verdict"); el_.innerHTML=parts.map(function(x){return "<span class='vi'>"+x+"</span>";}).join(" <span class='sep'>·</span> "); el_.hidden=false;
-  el_.setAttribute("aria-label","Verdict du mois, pondération "+(mode==="capi"?"par capitalisation":"égale"));
+/* Phrase d'interprétation, entièrement générée à partir des données du jour */
+function signalPhrase(){
+  var s=G.score, e=s-50, d3=G.variations["3m"].variation, nom= mode==="capi"?"Le climat mondial":"Le climat mondial (zones à parts égales)";
+  var pos= Math.abs(e)<2.5 ? "proche de sa moyenne des dix dernières années" : (Math.abs(e)>=10?"nettement ":"")+(e>0?"au-dessus":"au-dessous")+" de sa moyenne des dix dernières années";
+  var cs=contribs(3,"w").filter(function(c){return d3<0?c.v<0:c.v>0;}).sort(function(x,y){return Math.abs(y.v)-Math.abs(x.v);}), k=cs[0];
+  var dir= Math.abs(d3)<1 ? "stable sur trois mois ("+sg(d3,1)+" pt)"
+    : (d3<0?"en recul":"en hausse")+" de "+fx(Math.abs(d3),1)+" "+pts(d3)+" sur trois mois"+(k?(d3<0?", surtout à cause "+de(nomInd(k,true)):", surtout grâce "+a(nomInd(k,true))):"");
+  return nom+" est <strong>"+state(s).t.toLowerCase()+"</strong> ("+fx(s,1)+"/100, "+pos+") et "+dir+".";
 }
-function setBar(p,v){var f=$(p+"Fill"); f.style.width=Math.max(0,Math.min(100,v))+"%"; f.style.background="var(--"+state(v).c+")"; $(p+"Val").textContent=fx(v,0);}
 function drawGauge(box,v){
   var w=156,h=96,cx=78,cy=80,r=56;
   function pt(p,rr){var a=Math.PI*(1-p/100); return [cx+rr*Math.cos(a), cy-rr*Math.sin(a)];}
@@ -701,6 +788,10 @@ function renderQuad(){
       scales:{x:{min:x0,max:x1,title:{display:true,text:"Croissance (score de 0 à 100)",color:tc},ticks:{color:tc,stepSize:10},grid:{color:alpha(gc,.6)}},
               y:{min:y0,max:y1,title:{display:true,text:"Inflation sur un an",color:tc},ticks:{color:tc,stepSize:1,callback:function(v){return fx(v,0)+" %";}},grid:{color:alpha(gc,.6)}}},
       plugins:{legend:{display:false}, tooltip:{callbacks:{label:function(c){var p=c.raw; return c.dataset.label+", "+mlab(p.m)+" : croissance "+fx(p.x,0)+", inflation "+fx(p.y,1)+" %";}}}}}});
+  var ART_Z={us:["les États-Unis","sont"],ez:["la zone euro","est"],jp:["le Japon","est"]}, EN={Expansion:"en expansion",Surchauffe:"en surchauffe",Ralentissement:"en ralentissement",Stagflation:"en stagflation"};
+  var same=ZK.filter(function(k){return D.zones[k].regime===G.regime;}), autres=ZK.filter(function(k){return D.zones[k].regime!==G.regime;});
+  function liste(a){return a.length<2?a.join(""):a.slice(0,-1).join(", ")+" et "+a[a.length-1];}
+  $("quadTitle").textContent="Le monde est "+EN[G.regime]+(same.length?", comme "+liste(same.map(function(k){return ART_Z[k][0];})):"")+(autres.length?" ; "+autres.map(function(k){return ART_Z[k][0]+" "+ART_Z[k][1]+" "+EN[D.zones[k].regime];}).join(", "):"")+".";
   $("quadLegend").innerHTML='<span>Point plein : '+mlab(M)+'</span><span>Traînée : 6 mois précédents</span><span>Pointillés : seuils (croissance '+fx(SC,0)+', inflation '+fx(SI,1)+' %)</span>';
   var tb=$("regTable"); tb.innerHTML="";
   RK.forEach(function(code){var r=REG[code], who=ZK.filter(function(k){return D.zones[k].regime===code;});
@@ -741,6 +832,23 @@ function spark(a,col){var w=200,h=44,lo=Infinity,hi=-Infinity,i,idx=[]; for(i=0;
   var d=idx.map(function(i,j){return (j?"L":"M")+X(i).toFixed(1)+" "+Y(a[i]).toFixed(1);}).join(""); var f=d+"L"+X(idx[idx.length-1]).toFixed(1)+" "+h+"L"+X(idx[0]).toFixed(1)+" "+h+"Z";
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><path d="'+f+'" fill="var('+col+')" fill-opacity=".10"/><path d="'+d+'" fill="none" stroke="var('+col+')" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';}
 
+/* ================= 2. Composantes du score (niveau) ================= */
+var cpScope="w";
+function renderComposantes(){
+  var b=bloc(cpScope), rows=niveauParIndicateur(cpScope).sort(function(x,y){return y.v-x.v;}), tot=rows.reduce(function(s,c){return s+c.v;},0);
+  var mx=Math.max.apply(null,rows.map(function(c){return Math.abs(c.v);}))||1, box=$("cpBars"); box.innerHTML="";
+  rows.forEach(function(c){var pos=c.v>=0, w=Math.abs(c.v)/mx*50;
+    box.appendChild(el("div",{class:"contrib"},'<span>'+esc(c.label)+(c.ss!==null&&c.ss!==undefined?' <span class="small muted">· '+fx(c.ss,0)+'</span>':'')+'</span><div class="cbar"><div class="axis"></div><div class="b" style="'+(pos?'left:50%':'right:50%')+';width:'+w+'%;background:var(--'+(pos?'good':'bad')+')"></div></div><span class="cval">'+sg(c.v,1)+'</span>'));});
+  var nom= cpScope==="w"?"Le score mondial":"Le score "+ZDE[cpScope], S=rows[0], F=rows[rows.length-1];
+  $("cpTitle").innerHTML=nom+" s'établit à "+fx(b.score,1)+(Math.abs(b.score-50)<0.05?", au niveau de la moyenne":(b.score>50?", au-dessus":", au-dessous")+" de 50")
+    +(S&&S.v>0?" : "+nomInd(S,false)+" le porte ("+sg(S.v,1)+")":"")+(F&&F.v<0?(S&&S.v>0?", ":" : ")+nomInd(F,false)+" le pénalise ("+sg(F.v,1)+")":"")+".";
+  $("cpNote").textContent= cpScope==="w" ? "Contribution = poids de la zone × poids de l'indicateur × (sous-score − 50), additionnée sur les trois zones ; le socle de risque, commun, compte pour 20 % du score mondial. Pondération : "+(mode==="capi"?"capitalisation.":"parts égales.")
+    : "Contribution = poids de l'indicateur × (sous-score − 50). Chiffre après le libellé : sous-score de la zone (0-100).";
+  var calc=50+tot, gap=Math.abs(calc-b.score), ck=$("cpCheck"); ck.className="check "+(gap<=0.05?"ok":"ko");
+  ck.textContent= gap<=0.05 ? "Contrôle : 50 + somme des contributions ("+sg(tot,2)+") = "+fx(calc,2)+" = score publié ("+fx(b.score,2)+")."
+    : "Écart de contrôle : 50 + somme des contributions = "+fx(calc,2)+" contre un score publié de "+fx(b.score,2)+". Vérifier le script de collecte.";
+}
+
 /* ================= Dynamique ================= */
 var hz=3, scope="w";
 function renderDyn(){
@@ -772,6 +880,9 @@ function renderLegend(){var lg=$("legend"); lg.innerHTML="";
   RK.forEach(function(c){lg.appendChild(el("span",{class:"small muted",style:"display:inline-flex;align-items:center;gap:6px;margin-left:4px"},'<i style="width:12px;height:8px;border-radius:2px;background:var('+REG[c].col+')"></i>'+c));});}
 function renderHist(){
   renderLegend();
+  var h12=histMap(G.historique)[addM(M,-12)], d12=G.variations["12m"].variation, s0=h12!==undefined?state(h12):null, s1=state(G.score);
+  var zoneTxt={good:"favorable (au-dessus de 60)",warn:"neutre (entre 40 et 60)",bad:"dégradée (sous 40)"};
+  $("histTitle").textContent="En un an, le score mondial "+(Math.abs(d12)<0.05?"est stable":(d12<0?"a reculé":"a progressé")+" de "+fx(Math.abs(d12),1)+" "+pts(d12))+" et "+(s0&&s0.c===s1.c?"reste en zone ":"passe en zone ")+zoneTxt[s1.c]+".";
   if(!window.Chart){$("histBox").innerHTML='<p class="small muted">Graphique indisponible (bibliothèque Chart.js non chargée).</p>'; return;}
   var labels=months("2016-01",M), narrow=$("histBox").clientWidth<560;
   $("histBox").style.height=(narrow?320:380)+"px";
@@ -827,7 +938,6 @@ function renderRisk(){var box=$("riskCards"); box.innerHTML="";
 }
 
 /* ================= Allocation ================= */
-function allocTitle(a){var t= a[0]>=65?"Surpondérer les actions": a[0]>=55?"Proche de la référence 60 / 40": a[0]>=40?"Sous-pondérer modérément les actions":"Posture défensive"; return t+" ("+a[0]+" % actions)";}
 var LAB=["Actions","Oblig. d'État","Actifs réels","Liquidités"], COL=["var(--a1)","var(--a2)","var(--a3)","var(--a4)"], TXT=["var(--a1t)","var(--a2t)","var(--a3t)","var(--a4t)"];
 function stack(id,a,short){var h=""; a.forEach(function(p,i){if(p>0) h+='<div style="width:'+p+'%;background:'+COL[i]+';color:'+TXT[i]+'" title="'+LAB[i]+' '+p+' %" data-l="'+(short?"":LAB[i]+" "+p+" %")+'" data-c="'+p+' %"><span></span></div>';}); $(id).innerHTML=h; fitStacks();}
 /* Libellé le plus long qui tient dans chaque segment : « Actions 40 % », sinon « 40 % », sinon rien (valeur dans l'infobulle) */
@@ -838,7 +948,9 @@ function renderAlloc(){
   var al=G.allocation.brut, tb=$("steps"); tb.innerHTML="";
   al.etapes.forEach(function(st,j){var cur=arr(st), prev=j?arr(al.etapes[j-1]):null;
     tb.appendChild(el("tr",null,'<td>'+esc(st.etape)+'<div class="small muted">'+esc(st.motif)+'</div></td>'+cur.map(function(v,i){var d=prev?v-prev[i]:0; return '<td class="n">'+v+' %'+(d?' <span class="small '+dcls(d)+'">('+(d>0?"+":"−")+Math.abs(d)+')</span>':'')+'</td>';}).join("")));});
-  var fin=arr(al.finale);
+  var fin=arr(al.finale), quoi=[];
+  al.etapes.forEach(function(st,j){if(j&&st.A!==al.etapes[j-1].A) quoi.push(j===1?"le climat":"la valorisation");});
+  $("allocTitle2").textContent="Actions à "+fin[0]+" %"+(fin[0]!==60?" ("+sg(fin[0]-60,0)+" points par rapport au 60/40)":", comme le 60/40")+" : base "+(al.etapes[0].A)+" % en "+G.regime.toLowerCase()+(quoi.length?", corrigée par "+quoi.join(" et "):", sans correction")+".";
   tb.appendChild(el("tr",{style:"background:var(--band)"},'<td><strong>Orientation retenue ('+(mode==="capi"?"pondération capi":"pondération égale")+')</strong></td>'+fin.map(function(v){return '<td class="n"><strong>'+v+' %</strong></td>';}).join("")));
   stack("stackRef",[60,40,0,0]); stack("stackNow",fin);
   var cf=G.allocation.confirme;
@@ -867,7 +979,7 @@ function renderTest(){
     n++; var d=e.perf_barometre-e.perf_60_40, dd=e.perte_max_barometre-e.perte_max_60_40; if(d>0) win++; if(dd>0) winDD++;
     var seq=[], last=null; e.mois.forEach(function(m){if(m.regime!==last){seq.push({r:m.regime,n:1}); last=m.regime;} else seq[seq.length-1].n++;});
     var avgA=e.mois.reduce(function(s,m){return s+m.A;},0)/e.mois.length;
-    card.innerHTML='<div class="kicker">'+mlab(e.mois[0].mois)+' à '+mlab(e.mois[e.mois.length-1].mois)+'</div><h3 style="font-size:16px;margin-top:4px">'+y+' · '+(EPIS[y]||"")+'</h3>'
+    card.innerHTML='<div class="kicker">'+mlab(e.mois[0].mois)+' à '+mlab(e.mois[e.mois.length-1].mois)+'</div><h3 style="font-size:16px;margin-top:4px">'+y+' · '+(EPIS[y]||"")+'</h3><p class="ctitle small" style="margin:4px 0 0">Le baromètre fait '+(d>=0?'mieux':'moins bien')+' que le 60/40 : '+sg(e.perf_barometre,1)+' % contre '+sg(e.perf_60_40,1)+' %.</p>'
       +'<div class="chartbox" style="height:190px;margin-top:10px"><canvas role="img" aria-label="Valeur (base 100 au départ) du portefeuille baromètre et du 60/40 en '+y+'"></canvas></div>'
       +'<div class="kv" style="margin-top:12px"><span class="muted">Sur la période</span><span class="muted">baromètre · 60/40</span>'
       +'<span>Performance</span><span>'+sg(e.perf_barometre,1)+' % · '+sg(e.perf_60_40,1)+' %</span>'
@@ -899,9 +1011,11 @@ function renderTest(){
 /* ================= Sources ================= */
 function renderSources(){
   var pz=D.parametres.ponderations.capi;
-  $("capNote").textContent="Score mondial : moyenne des zones pondérée par la capitalisation boursière (États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ez*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %, estimation à partir des fiches MSCI) ou à parts égales.";
   var ss=D.sources||[], nok=ss.filter(function(s){return statSrc(s).c==="ok";}).length;
-  $("srcSum").textContent=ss.length+" séries, "+(ss.length-nok?(ss.length-nok)+" à surveiller":"aucun signalement");
+  $("indSum").innerHTML="<strong>9 indicateurs</strong>, répartis en 4 familles et calculés pour 3 zones, couvrent <strong>7 des 8 catégories</strong> citées par le sujet, qui en demande au moins 5. Seuls les flux de capitaux manquent (voir Limites).";
+  $("wCapi").textContent=[pz.us,pz.ez,pz.jp].map(function(v){return fx(v*100,0);}).join(" / ");
+  var vx=bval("vix"), sv=D.zones.us.sous_scores.vix, z=sv/100*6-3;
+  $("zExample").innerHTML= vx!==null&&sv!==undefined ? "<strong>Exemple, VIX de "+mlong(M)+" :</strong> "+fx(vx,1)+" points. Après inversion, z = "+fx(z,2)+(z<0?" (VIX au-dessus de sa moyenne de 10 ans)":" (VIX au-dessous de sa moyenne de 10 ans)")+", soit un sous-score de ("+fx(z,2)+" + 3) / 6 × 100 = "+fx(sv,0)+"." : "";
   $("srcNote").textContent=ss.length+" séries, "+nok+" sans signalement. Mois de la dernière observation de chaque source, relevé lors de la collecte du "+new Date(D.genere_le).toLocaleDateString("fr-FR")+" (PIB : trimestre).";
   var tb=$("srcTable"); tb.innerHTML="";
   var groupes=GROUPES_ORDRE.concat(ss.map(function(s){return s.groupe;}).filter(function(g,i,a){return GROUPES_ORDRE.indexOf(g)<0&&a.indexOf(g)===i;}));

@@ -1,122 +1,131 @@
 # Format de `site/data.json`
 
-Contrat entre le script de collecte (`collect/`) et la page (`site/index.html`).
-La page ne fait aucun calcul de score : elle affiche ce que le script a calculé
-selon la note de cadrage v4. Seules exceptions, de simple arithmétique sur les
-données fournies : les **contributions** (poids × variation des sous-scores),
-les **variations** 1 / 3 / 12 mois et le **classement** des zones par score.
+Contrat entre le script de collecte (`collect/collect.py`) et la page
+(`site/index.html`). **Le script fait foi** : ce document décrit le fichier tel
+qu'il le produit. La page ne fait aucun calcul de score ; elle affiche ce que le
+script a calculé selon la note de cadrage v4. Seules mises en forme côté page :
+valeurs brutes affichées (glissement annuel, tendance sur 12 mois) recalculées à
+partir du bloc `brut`, et contrôle « somme des contributions = variation ».
 
 ## Conventions
 
-- Toutes les séries temporelles sont des tableaux de même longueur que `dates`
-  (un élément par mois, du plus ancien au plus récent). Valeur absente : `null`.
-- `dates` : mois au format `"AAAA-MM"`. Le mois de référence affiché est le
-  dernier mois où `monde.cap.score` n'est pas `null`. L'historique doit couvrir
-  au moins 2016 à aujourd'hui (et commencer vers 2006 pour la fenêtre de 10 ans).
-- Codes de zone : `us`, `ea`, `jp`.
-- Codes d'indicateur de zone : `gdp` (PIB), `cli` (indicateur avancé OCDE),
-  `infl` (inflation), `eq` (tendance actions), `slope` (pente 10 ans − 3 mois).
-- Codes du socle de risque : `vix`, `baa`, `gpr`, `oil`.
-- Codes de régime : `expansion`, `surchauffe`, `ralentissement`, `stagflation`.
-- Répartitions d'allocation : tableau `[actions, obligations d'État, actifs réels, liquidités]`
-  en points de pourcentage entiers, total 100.
+- Mois au format `"AAAA-MM"`. Mois de référence : `mois_de_calcul`.
+- Codes de zone : `us`, `ez`, `jp`.
+- Codes d'indicateur de zone : `pib`, `cli`, `inflation`, `actions`, `pente`.
+- Codes du socle de risque : `vix`, `credit`, `gpr`, `brent`.
+- Régimes : `"Expansion"`, `"Surchauffe"`, `"Ralentissement"`, `"Stagflation"`.
+- Pondérations du score mondial : `capi` (84 / 9 / 7) et `egal` (1/3 chacune).
+- Allocation : objet `{"A": actions, "O": obligations d'État, "R": actifs réels,
+  "L": liquidités}` en points de pourcentage entiers, total 100.
+- Deux règles de régime coexistent : `brut` (régime du mois, règle de la note)
+  et `confirme` (changement acté après deux mois consécutifs, piste de la note).
+  La page affiche `brut` par défaut.
+- Séries historiques : objet `{"dates": [...], "valeurs": [...]}` depuis 2007.
 
 ## Structure
 
 ```jsonc
 {
-  "version": 1,
-  "genere_le": "2026-11-19T06:12:00Z",   // horodatage UTC de la collecte
-  "simule": false,                        // true uniquement pour un jeu de test (bandeau rouge sur le site)
-  "dates": ["2006-01", "...", "2026-10"],
+  "genere_le": "2026-11-19T16:29:49Z",       // horodatage UTC de la collecte
+  "mois_de_calcul": "2026-11",                // dernier mois où tous les sous-scores existent
 
-  "poids": {
-    "zones": {"us": 0.84, "ea": 0.09, "jp": 0.07},   // pondération capitalisation
-    "maj_capi": "2026-08",                            // date des fiches MSCI utilisées
-    "indicateurs": {"gdp": 0.15, "cli": 0.15, "infl": 0.20, "eq": 0.15, "slope": 0.15},
-    "risque": {"vix": 0.05, "baa": 0.05, "gpr": 0.05, "oil": 0.05}
+  "parametres": {
+    "ponderations": {"capi": {"us": 0.84, "ez": 0.09, "jp": 0.07}, "egal": {...}},
+    "poids_zone":  {"pib": 0.15, "cli": 0.15, "inflation": 0.20, "actions": 0.15, "pente": 0.15},
+    "poids_socle": {"vix": 0.05, "credit": 0.05, "gpr": 0.05, "brent": 0.05},
+    "bases_regime": {"Expansion": {"A": 65, "O": 25, "R": 5, "L": 5}, ...},
+    "seuil_croissance": 50, "seuil_inflation": 2.5, "fenetre_climat_mois": 120,
+    "bonus_regime": {"Expansion": 5, "Surchauffe": 0, "Ralentissement": 0, "Stagflation": -5}
   },
+  "libelles": {"zones": {"us": "États-Unis", ...}, "indicateurs": {"pib": "Croissance du PIB", ...}},
+
+  "sources": [
+    {"cle": "us_pib", "groupe": "États-Unis", "serie": "PIB réel", "source": "FRED, GDPC1",
+     "statut": "OK",                  // "OK" | "OK (copie de secours)" | "ÉCHEC : ..."
+     "derniere_date": "2026-09",      // mois de la dernière observation (PIB : dernier mois du trimestre)
+     "derniere_valeur": 24611.077,
+     "erreur": "..."}                 // présent seulement en cas d'échec
+  ],
+  "sources_en_echec": [],             // libellés des séries en échec
 
   "zones": {
     "us": {
-      "score": [],                 // score de climat de la zone, 0-100
-      "croissance": [],            // moyenne des sous-scores gdp et cli
-      "sous_scores": {"gdp": [], "cli": [], "infl": [], "eq": [], "slope": []},   // 0-100
-      "brut": {
-        "gdp": [],    // glissement annuel du PIB réel, en %
-        "cli": [],    // indice CLI (100 = tendance)
-        "infl": [],   // inflation sur un an, en % (sert aussi à l'axe du quadrant)
-        "eq": [],     // cours / moyenne 12 mois − 1, en fraction (0.054 = +5,4 %)
-        "slope": []   // taux 10 ans − taux 3 mois, en points de %
+      "nom": "États-Unis",
+      "score": 51.11,
+      "variations": {
+        "1m":  {"variation": -0.53, "phrase": "Sur un mois, ...",
+                "contributions": [{"zone": "us", "indicateur": "pib",
+                                   "libelle": "Croissance du PIB (États-Unis)", "contribution": -0.0022}, ...]},
+        "3m":  {...}, "12m": {...}
       },
-      "taux_reel": [],             // taux réel 10 ans, en %
-      "attrait_oblig": [],         // 0-100, Z-score sur l'historique long
-      "regime": []                 // code de régime de la zone
+      "niveau": {"ecart_a_50": 1.11, "contributions": [...]},
+      "sous_scores": {"pib": 46.99, "cli": 67.44, "inflation": 50.07, "actions": 36.91, "pente": 56.36,
+                      "vix": 36.06, "credit": 69.52, "gpr": 38.41, "brent": 54.82},
+      "croissance": 57.22,            // moyenne des sous-scores pib et cli
+      "inflation": 3.29,              // glissement annuel, en %
+      "regime": "Surchauffe", "regime_confirme": "Surchauffe",
+      "trajectoire_6m": [{"mois": "2026-05", "croissance": 57.49, "inflation": 3.82}, ...],  // 7 points
+      "historique": {"dates": [...], "valeurs": [...]}   // score mensuel
     },
-    "ea": {}, "jp": {}
-  },
-
-  "risque": {
-    "score": [],                                         // moyenne des 4 sous-scores
-    "sous_scores": {"vix": [], "baa": [], "gpr": [], "oil": []},   // 0-100, inversés
-    "brut": {
-      "vix": [],   // points
-      "baa": [],   // points de %
-      "gpr": [],   // indice
-      "oil": []    // Brent / moyenne 12 mois − 1, en fraction
-    }
-  },
-
-  "valorisation": {
-    "cape": [],              // PER de Shiller
-    "taux_reel_us": [],      // DFII10, en %
-    "prime": [],             // 100 / CAPE − taux réel US, en points de %
-    "attrait_actions": []    // 0-100, Z-score sur l'historique long
+    "ez": {...}, "jp": {...}
   },
 
   "monde": {
-    "cap": {                          // pondération par capitalisation
-      "score": [], "croissance": [], "inflation": [], "attrait_oblig": [], "regime": [],
+    "capi": {
+      "score", "variations", "niveau", "croissance", "inflation",
+      "regime", "regime_confirme", "trajectoire_6m", "historique",   // comme pour une zone
+      "historique_regime": {"dates": [...], "valeurs": ["Expansion", ...]},
+      "historique_regime_confirme": {...},
       "allocation": {
-        "etapes": [
-          {"etape": "regime", "regime": "ralentissement", "repartition": [35, 50, 5, 10]},
-          {"etape": "climat", "valeur": 47.2, "regle": "neutre", "repartition": [35, 50, 5, 10]},
-          //   regle : "degrade" (< 40) | "neutre" | "favorable" (>= 60)
-          {"etape": "valorisation", "valeur": 22.4, "regle": "cheres", "vers": "oblig",
-           "repartition": [25, 60, 5, 10]}
-          //   regle : "cheres" (< 35) | "normale" | "bon_marche" (> 65)
-          //   vers  : "oblig" | "liquidites" | null
-        ],
-        "finale": [25, 60, 5, 10]
+        "brut": {"finale": {"A": 40, "O": 20, "R": 30, "L": 10},
+                 "etapes": [{"etape": "1. Base du régime", "motif": "Régime mondial : Surchauffe",
+                             "A": 50, "O": 10, "R": 30, "L": 10}, ...]},   // 3 étapes
+        "confirme": {...}
+      },
+      "test_historique": {
+        "brut": {
+          "2008": {"disponible": true, "periode": "2008-01 à 2008-12",
+                   "perf_barometre": -17.24, "perf_60_40": -19.63,          // en %
+                   "perte_max_barometre": -22.28, "perte_max_60_40": -22.44,  // en %
+                   "mois": [{"mois": "2008-01", "regime": "Surchauffe", "A": 50, "O": 10, "R": 30, "L": 10,
+                             "barometre": 97.34, "ref_60_40": 97.33}, ...]},  // base 100 avant le 1er mois
+          "2020": {...}, "2022": {...}
+        },
+        "confirme": {...}
       }
     },
-    "egal": {}                        // même structure, pondération égale (1/3 chacune)
+    "egal": {...}                     // même structure, pondération égale
   },
 
-  "series": [
-    {
-      "id": "us_gdp",
-      "groupe": "us",              // us | ea | jp | socle | valorisation
-      "indicateur": "gdp",         // code d'indicateur, ou cape / tips / taux10 pour la valorisation
-      "libelle": "PIB réel",
-      "source": "FRED",
-      "code": "GDPC1",
-      "frequence": "trimestrielle",   // quotidienne | mensuelle | trimestrielle
-      "derniere_date": "2026-07-01",  // date de la dernière observation de la source
-      "statut": "ok",                 // ok | retard | secours
-      "message": ""                   // ex. « source indisponible, valeur du 18/11 conservée »
-    }
+  "valorisation": {
+    "prime_de_risque_actions": -0.35, // 100 / CAPE − DFII10, en points
+    "attrait_actions": 9.57,          // 0-100, Z-score sur l'historique long
+    "cape": 39.37,
+    "taux_reels_10a": {"us": 2.89, "ez": -0.59, "jp": 1.61},
+    "attrait_obligations_zones": {"us": 80.62, "ez": 46.65, "jp": 54.97},
+    "attrait_obligations": {"capi": 75.77, "egal": 60.75},
+    "historique_attrait_actions": {"dates": [...], "valeurs": [...]}
+  },
+
+  "preference_geographique": [
+    {"zone": "jp", "nom": "Japon", "score": 57.7, "variation_3m": -10.96, "regime": "Expansion",
+     "points": 51.73,                 // score + variation 3 mois + bonus de régime
+     "rang": 1, "position": "Surpondérer"}, ...
   ],
 
-  "alertes": []                     // messages libres affichés en tête de page
+  "limites": ["...", ...],
+
+  "brut": {                           // séries mensuelles brutes, une valeur par mois depuis "debut"
+    "vix": {"debut": "1990-01-01", "valeurs": [25.36, ...]}, ...
+  }
 }
 ```
 
 ## Règles à respecter côté collecte
 
-- Si une source échoue : reprendre la série du `data.json` précédent, mettre
-  `statut: "secours"` et expliquer dans `message`.
-- La somme des contributions doit égaler la variation du score : la page le
-  vérifie et affiche un avertissement si l'écart dépasse 0,05 point.
-  Cela suppose `score zone = Σ poids indicateur × sous-score + Σ poids risque × sous-score risque`
-  et `score monde = Σ poids zone × score zone`.
+- Si une source échoue : reprendre la série du `brut` précédent, mettre
+  `statut: "ÉCHEC : dernière valeur du data.json précédent conservée"` et
+  renseigner `erreur`. La page affiche alors un bandeau d'alerte.
+- La somme des contributions doit égaler la variation du score (ou l'écart à 50
+  en mode niveau) : la page le vérifie et affiche un avertissement si l'écart
+  dépasse 0,05 point.

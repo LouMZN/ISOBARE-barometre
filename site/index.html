@@ -158,7 +158,7 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
       <h1>Baromètre synthétique mondial</h1>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#synthese">Synthèse</a><a href="#regime">Régime</a><a href="#valorisation">Valorisation</a><a href="#dynamique">Dynamique</a><a href="#historique">Historique</a><a href="#zones">Zones</a><a href="#risque">Risque</a><a href="#allocation">Allocation</a><a href="#methode">Méthode</a><a href="#limites">Limites</a>
+      <a href="#synthese">Synthèse</a><a href="#regime">Régime</a><a href="#valorisation">Valorisation</a><a href="#dynamique">Dynamique</a><a href="#historique">Historique</a><a href="#zones">Zones</a><a href="#risque">Risque</a><a href="#allocation">Allocation</a><a href="#test">Test historique</a><a href="#methode">Méthode</a><a href="#limites">Limites</a>
     </nav>
   </div>
 </header>
@@ -285,11 +285,45 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
         <div class="small" style="margin-top:14px">Référence du cours (60 / 40)</div><div class="stack" id="stackRef"></div>
         <div class="small" style="margin-top:8px">Orientation actuelle</div><div class="stack" id="stackNow"></div>
         <p class="small muted" style="margin:8px 0 0">Actifs réels : or, matières premières, obligations indexées sur l'inflation.</p>
+        <p class="small" style="margin:8px 0 0" id="confNote"></p>
       </div>
       <div class="card">
         <h3>Préférence géographique</h3>
         <div class="tablewrap" style="margin-top:8px"><table class="compact"><thead><tr><th>Rang</th><th>Zone</th><th>Régime</th><th class="n">Score</th><th class="n">3 mois</th><th>Orientation</th></tr></thead><tbody id="rank"></tbody></table></div>
-        <p class="small muted" style="margin:10px 0 0">Classement par score de climat de zone, indépendant de la pondération du score mondial. Chaque zone est notée par rapport à sa propre histoire : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres dans l'absolu ».</p>
+        <p class="small muted" style="margin:10px 0 0" id="rankNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEST HISTORIQUE -->
+  <section id="test">
+    <h2>Test historique : 2008, 2020, 2022 face au 60 / 40</h2>
+    <p class="sub">Que serait-il advenu si l'on avait suivi les règles du baromètre pendant trois crises récentes ? Chaque mois, l'allocation est décidée avec les données de fin du mois précédent, puis comparée à l'allocation de référence du cours : 60 % actions, 40 % obligations d'État.</p>
+    <div class="notice" style="margin:0 0 16px"><strong>Illustration, pas une preuve.</strong> Trois épisodes ne constituent pas un échantillon : un écart favorable ou défavorable peut tenir au hasard du calendrier. Les données utilisées sont celles connues aujourd'hui (révisions et retards de publication ignorés, PIB notamment), ce qui avantage le baromètre. Les seuils n'ont pas été ajustés pour améliorer ce test.</div>
+    <div class="toolbar"><span class="lbl" id="thlbl">Changement de régime</span><div class="seg" role="group" aria-labelledby="thlbl" id="thSeg"></div><span class="small muted">Pondération : celle choisie en synthèse.</span></div>
+    <p class="lead" id="testSummary" style="margin:0 0 14px"></p>
+    <div class="grid three" id="testCards"></div>
+    <div class="grid two" style="margin-top:16px">
+      <div class="card">
+        <h3>Résultats de la variante affichée</h3>
+        <div class="tablewrap" style="margin-top:8px"><table class="compact">
+          <thead><tr><th>Épisode</th><th class="n">Baromètre</th><th class="n">60 / 40</th><th class="n">Écart</th><th class="n">Perte max. baromètre</th><th class="n">Perte max. 60 / 40</th></tr></thead>
+          <tbody id="testTable"></tbody></table></div>
+        <h3 style="margin-top:18px">Sensibilité : écart de performance contre le 60 / 40</h3>
+        <div class="tablewrap" style="margin-top:8px"><table class="compact">
+          <thead><tr id="testSensHead"></tr></thead><tbody id="testSens"></tbody></table></div>
+      </div>
+      <div class="card">
+        <h3>Hypothèses de calcul</h3>
+        <ul class="small" style="padding-left:18px; margin:8px 0 0">
+          <li>Décision en fin de mois avec le régime, le score et la valorisation de ce mois ; rééquilibrage mensuel, sans frais ni fiscalité.</li>
+          <li>Actions : indice S&amp;P composite (moyennes mensuelles de Shiller), dividendes réinvestis.</li>
+          <li>Obligations d'État : 10 ans américain reconstitué à partir du taux (portage + effet de duration).</li>
+          <li>Actifs réels : moitié obligations indexées américaines reconstituées, moitié Brent.</li>
+          <li>Liquidités : bons du Trésor à 3 mois.</li>
+          <li>Référence 60 / 40 : mêmes séries actions et obligations, rééquilibrée chaque mois.</li>
+          <li>Actifs américains uniquement : la préférence géographique n'est pas testée.</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -319,7 +353,7 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
           <li>Climat : Z-score sur 10 ans glissants, écrêté à ±3, converti en <code>s = (z + 3) / 6 × 100</code> ; inversion pour le risque ; écart absolu à 2 % pour l'inflation, inversé.</li>
           <li>Valorisation : Z-score sur l'historique long disponible. Actions : 1 / PER de Shiller moins taux réel 10 ans américain. Obligations : taux réel 10 ans par zone.</li>
           <li>Régime : croissance (moyenne des sous-scores PIB et CLI, seuil 50) × inflation (seuil 2,5 %). Bases A / O / R / L : expansion 65 / 25 / 5 / 5, surchauffe 50 / 10 / 30 / 10, ralentissement 35 / 50 / 5 / 10, stagflation 30 / 15 / 30 / 25.</li>
-          <li>Allocation : climat &lt; 40 : actions −10 vers liquidités ; ≥ 60 : actions +5. Attrait actions &lt; 35 : actions −10 vers obligations si leur attrait ≥ 50, sinon vers liquidités ; &gt; 65 : actions +5.</li>
+          <li>Allocation : climat &lt; 40 : actions −10 vers liquidités ; ≥ 60 : actions +5 (pris sur les liquidités, puis sur les obligations). Attrait actions &lt; 35 : actions −10 vers obligations si leur attrait ≥ 50, sinon vers liquidités ; &gt; 65 : actions +5.</li>
           <li>Contributions : poids de la zone × poids de l'indicateur × variation du sous-score ; leur somme égale la variation du score (contrôle affiché dans la section Dynamique).</li>
         </ol>
       </div>
@@ -328,7 +362,7 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
       <h3>Sources et fraîcheur des séries</h3>
       <p class="small muted" style="margin:4px 0 8px" id="srcNote"></p>
       <div class="tablewrap"><table>
-        <thead><tr><th>Groupe</th><th>Série</th><th>Source</th><th>Fréquence</th><th>Dernière donnée</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Groupe</th><th>Série</th><th>Source</th><th class="n">Dernière valeur</th><th>Dernière donnée</th><th>Statut</th></tr></thead>
         <tbody id="srcTable"></tbody></table></div>
     </div>
   </section>
@@ -357,34 +391,47 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
 (function(){
 "use strict";
 
+/* =====================================================================
+   La page lit le data.json produit par collect/collect.py (format décrit
+   dans docs/format_data_json.md). Elle n'effectue aucun calcul de score :
+   seules des mises en forme (glissements annuels, tendances affichées à
+   titre de valeur brute) sont faites à partir du bloc « brut ».
+   ===================================================================== */
+
 /* ================= Référentiels ================= */
-var ZK = ["us","ea","jp"];
-var ZN = {us:"États-Unis", ea:"Zone euro", jp:"Japon"};
-var ZC = {us:"--us", ea:"--ea", jp:"--jp"};
+var ZK = ["us","ez","jp"];
+var ZN = {us:"États-Unis", ez:"Zone euro", jp:"Japon"};
+var ZC = {us:"--us", ez:"--ea", jp:"--jp"};
+var ZDE = {us:"des États-Unis", ez:"de la zone euro", jp:"du Japon"};
 var COMP = [
-  {k:"gdp",   label:"Croissance du PIB",       art:"la croissance du PIB",         fmt:function(v){return fx(v,1)+" %";}},
-  {k:"cli",   label:"Indicateur avancé OCDE",  art:"l'indicateur avancé de l'OCDE", fmt:function(v){return fx(v,1);}},
-  {k:"infl",  label:"Inflation (écart à 2 %)", art:"l'inflation",                  fmt:function(v){return fx(v,1)+" % sur un an";}},
-  {k:"eq",    label:"Tendance actions",        art:"la tendance des actions",      fmt:function(v){return sg(v*100,1)+" %";}},
-  {k:"slope", label:"Pente 10 ans − 3 mois",   art:"la pente des taux",            fmt:function(v){return sg(v,2)+" pt";}}
+  {k:"pib",       label:"Croissance du PIB",       raw:function(z){return fx(yoy(z+"_pib"),1)+" %";}},
+  {k:"cli",       label:"Indicateur avancé OCDE",  raw:function(z){return fx(bval(z+"_cli"),1);}},
+  {k:"inflation", label:"Inflation (écart à 2 %)", raw:function(z){return fx(D.zones[z].inflation,1)+" % sur un an";}},
+  {k:"actions",   label:"Tendance actions",        raw:function(z){return sg(trend(z+"_actions")*100,1)+" %";}},
+  {k:"pente",     label:"Pente 10 ans − 3 mois",   raw:function(z){return sg(bval(z+"_pente"),2)+" pt";}}
 ];
+var SRC = {
+  us:{pib:"us_pib", cli:"us_cli", inflation:"us_prix", actions:"us_actions", pente:"us_pente", taux:"dfii10"},
+  ez:{pib:"ez_pib", cli:"ez_cli", inflation:"ez_inflation", actions:"ez_actions", pente:"ez_pente", taux:"ez_10a"},
+  jp:{pib:"jp_pib", cli:"jp_cli", inflation:"jp_prix", actions:"jp_actions", pente:"jp_pente", taux:"jp_10a"}
+};
 var RISK = [
-  {k:"vix", label:"VIX",                 art:"le VIX",                 sub:"Volatilité implicite à 30 jours du S&P 500", fmt:function(v){return fx(v,1)+" pts";}},
-  {k:"baa", label:"Spread de crédit",    art:"le spread de crédit",    sub:"Moody's Baa contre taux 10 ans américain",   fmt:function(v){return fx(v,2)+" pt";}},
-  {k:"gpr", label:"Risque géopolitique", art:"le risque géopolitique", sub:"Indice Caldara et Iacoviello",               fmt:function(v){return fx(v,0);}},
-  {k:"oil", label:"Choc pétrolier",      art:"le prix du pétrole",     sub:"Brent, écart à sa moyenne 12 mois",          fmt:function(v){return sg(v*100,1)+" %";}}
+  {k:"vix",    src:"vix",    label:"VIX",                 sub:"Volatilité implicite à 30 jours du S&P 500", val:function(m){return bval("vix",m);},       fmt:function(v){return fx(v,1)+" pts";}},
+  {k:"credit", src:"baa10y", label:"Spread de crédit",    sub:"Moody's Baa contre taux 10 ans américain",   val:function(m){return bval("baa10y",m);},    fmt:function(v){return fx(v,2)+" pt";}},
+  {k:"gpr",    src:"gpr",    label:"Risque géopolitique", sub:"Indice Caldara et Iacoviello",               val:function(m){return bval("gpr",m);},       fmt:function(v){return fx(v,0);}},
+  {k:"brent",  src:"brent",  label:"Choc pétrolier",      sub:"Brent, écart à sa moyenne 12 mois",          val:function(m){return trend("brent",m);},    fmt:function(v){return sg(v*100,1)+" %";}}
 ];
 var REG = {
-  expansion:      {name:"Expansion",      col:"--r1", def:"Croissance forte, inflation maîtrisée", assets:"Actions", mix:[65,25,5,5]},
-  surchauffe:     {name:"Surchauffe",     col:"--r2", def:"Croissance forte, inflation élevée",    assets:"Actions de valeur, matières premières, obligations indexées", mix:[50,10,30,10]},
-  ralentissement: {name:"Ralentissement", col:"--r3", def:"Croissance faible, inflation maîtrisée", assets:"Obligations d'État", mix:[35,50,5,10]},
-  stagflation:    {name:"Stagflation",    col:"--r4", def:"Croissance faible, inflation élevée",   assets:"Liquidités, or, obligations indexées courtes", mix:[30,15,30,25]}
+  Expansion:      {col:"--r1", def:"Croissance forte, inflation maîtrisée",  assets:"Actions"},
+  Surchauffe:     {col:"--r2", def:"Croissance forte, inflation élevée",     assets:"Actions de valeur, matières premières, obligations indexées"},
+  Ralentissement: {col:"--r3", def:"Croissance faible, inflation maîtrisée", assets:"Obligations d'État"},
+  Stagflation:    {col:"--r4", def:"Croissance faible, inflation élevée",    assets:"Liquidités, or, obligations indexées courtes"}
 };
-var RK = ["expansion","surchauffe","ralentissement","stagflation"];
-var GROUPES = {socle:"Socle de risque", us:"États-Unis", ea:"Zone euro", jp:"Japon", valorisation:"Valorisation"};
-var FREQ = {quotidienne:"Quotidienne", mensuelle:"Mensuelle", trimestrielle:"Trimestrielle"};
-var STATUT = {ok:"À jour", retard:"En retard", secours:"Valeur conservée"};
+var RK = ["Expansion","Surchauffe","Ralentissement","Stagflation"];
+var GROUPES_ORDRE = ["Socle","États-Unis","Zone euro","Japon","Valorisation","Test historique"];
 var CRISES = [{a:"2020-02",b:"2020-07",t:"Covid-19"},{a:"2022-02",b:"2022-10",t:"Ukraine, inflation"}];
+var EPIS = {"2008":"Crise financière","2020":"Covid-19","2022":"Inflation et hausse des taux"};
+var AK = ["A","O","R","L"];
 
 /* ================= Utilitaires ================= */
 function fx(v,d){if(v===null||v===undefined||isNaN(v)) return "n.d."; return Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});}
@@ -401,29 +448,49 @@ var MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","o
 var MOISL=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 function mlab(s){var p=String(s).split("-"); return MOIS[+p[1]-1]+" "+p[0];}
 function mlong(s){var p=String(s).split("-"); return MOISL[+p[1]-1]+" "+p[0];}
-function dateSerie(s){
-  if(!s||!s.derniere_date) return "n.d.";
-  var p=s.derniere_date.split("-");
-  if(s.frequence==="trimestrielle") return "T"+(Math.floor((+p[1]-1)/3)+1)+" "+p[0];
-  if(s.frequence==="mensuelle") return mlab(p[0]+"-"+p[1]);
-  return (p[2]||"01")+"/"+p[1]+"/"+p[0];
-}
+function mnum(s){var p=String(s).split("-"); return (+p[0])*12+(+p[1]-1);}
+function addM(s,k){var n=mnum(s)+k, y=Math.floor(n/12), m=n%12+1; return y+"-"+(m<10?"0":"")+m;}
+function months(a,b){var o=[]; for(var m=a; mnum(m)<=mnum(b); m=addM(m,1)) o.push(m); return o;}
+function cap1(t){return t.charAt(0).toUpperCase()+t.slice(1);}
+function low1(t){return t.charAt(1)&&t.charAt(1)===t.charAt(1).toUpperCase()&&t.charAt(1)!==t.charAt(1).toLowerCase()? t : t.charAt(0).toLowerCase()+t.slice(1);}
 function seg(id,opts,cur,cb){var box=$(id); box.innerHTML=""; opts.forEach(function(o){var b=el("button",{type:"button","aria-pressed":String(o[0]===cur)},o[1]); b.addEventListener("click",function(){Array.prototype.forEach.call(box.children,function(c){c.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true"); cb(o[0]);}); box.appendChild(b);});}
+function arr(a){return AK.map(function(k){return a[k];});}
+function histMap(h){var o={}; if(h) h.dates.forEach(function(d,i){o[d]=h.valeurs[i];}); return o;}
+
+/* Séries brutes mensuelles (bloc « brut ») : dernière valeur connue au mois m */
+function bval(key,m){var b=D.brut&&D.brut[key]; if(!b) return null; m=m||M;
+  var i=mnum(m)-mnum(b.debut.slice(0,7)); if(i<0) return null; i=Math.min(i,b.valeurs.length-1);
+  while(i>=0&&(b.valeurs[i]===null||b.valeurs[i]===undefined)) i--; return i>=0?b.valeurs[i]:null;}
+function yoy(key,m){m=m||M; var a=bval(key,m), b=bval(key,addM(m,-12)); return a===null||b===null||!b? null : (a/b-1)*100;}
+function trend(key,m){m=m||M; var s=0; for(var j=0;j<12;j++){var v=bval(key,addM(m,-j)); if(v===null) return null; s+=v;} var c=bval(key,m); return c/(s/12)-1;}
+
+/* Sources */
+function src(cle){return (D.sources||[]).filter(function(s){return s.cle===cle;})[0];}
+function trimestrielle(s){return /_pib$/.test(s.cle);}
+function dateSrc(s){if(!s||!s.derniere_date) return "n.d."; var p=s.derniere_date.split("-"); return trimestrielle(s)? "T"+Math.ceil(+p[1]/3)+" "+p[0] : mlab(s.derniere_date);}
+function statSrc(s){
+  if(!s) return {c:"ok",t:""};
+  if(/^ÉCHEC/i.test(s.statut||"")) return {c:"secours",t:"Échec de collecte"};
+  if(/secours/i.test(s.statut||"")) return {c:"retard",t:"Copie de secours"};
+  if(s.derniere_date&&mnum(M)-mnum(s.derniere_date)>(trimestrielle(s)?5:2)) return {c:"retard",t:"Donnée ancienne"};
+  return {c:"ok",t:"Collectée"};
+}
+function badge(s){var st=statSrc(s); return st.c!=="ok"?' <span class="status '+st.c+'">'+st.t+'</span>':'';}
 
 /* ================= Chargement ================= */
-var D, L, S0, mode="cap", G;
+var D, M, mode="capi", G, regMode="brut";
 fetch("data.json",{cache:"no-store"}).then(function(r){
   if(!r.ok) throw new Error("data.json introuvable (HTTP "+r.status+")");
   return r.json();
 }).then(function(d){D=d; init();}).catch(function(e){
   $("loading").innerHTML='<div class="notice bad" style="text-align:left"><strong>Données indisponibles.</strong> '+esc(e.message)+'. Le fichier <code>data.json</code> est produit par le script de collecte quotidien ; vérifiez la dernière exécution dans l\'onglet Actions du dépôt GitHub.</div>';
+  $("loading").hidden=false; $("app").hidden=true;
   if(window.console) console.error(e);
 });
 
 function init(){
-  var n=D.dates.length;
-  L=n-1; while(L>0 && (D.monde.cap.score[L]===null||D.monde.cap.score[L]===undefined)) L--;
-  S0=D.dates.indexOf("2016-01"); if(S0<0) S0=0;
+  if(!D.zones||!D.monde||!D.monde.capi||!D.mois_de_calcul) throw new Error("format de data.json inattendu");
+  M=D.mois_de_calcul;
   renderAlerts();
   $("loading").hidden=true; $("app").hidden=false;
   if(window.Chart){
@@ -431,80 +498,74 @@ function init(){
     Chart.defaults.font.family='"IBM Plex Mono", ui-monospace, Menlo, monospace';
     Chart.defaults.font.size=11;
   }
-  $("wcap").addEventListener("click",function(){setMode("cap");});
+  $("wcap").addEventListener("click",function(){setMode("capi");});
   $("weq").addEventListener("click",function(){setMode("egal");});
   seg("hzSeg",[[1,"1 mois"],[3,"3 mois"],[12,"12 mois"],["lvl","Niveau"]],3,function(v){hz=v; renderDyn();});
-  seg("scSeg",[["w","Monde"],["us","États-Unis"],["ea","Zone euro"],["jp","Japon"]],"w",function(v){scope=v; renderDyn();});
+  seg("scSeg",[["w","Monde"],["us","États-Unis"],["ez","Zone euro"],["jp","Japon"]],"w",function(v){scope=v; renderDyn();});
+  seg("thSeg",[["brut","Changement immédiat"],["confirme","Confirmé sur 2 mois"]],"brut",function(v){regMode=v; renderTest();});
   renderStatic();
   all();
   var mq=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)");
-  if(mq&&mq.addEventListener) mq.addEventListener("change",function(){renderQuad(); renderHist();});
+  if(mq&&mq.addEventListener) mq.addEventListener("change",function(){renderQuad(); renderHist(); renderTest();});
 }
-function setMode(m){mode=m; $("wcap").setAttribute("aria-pressed",String(m==="cap")); $("weq").setAttribute("aria-pressed",String(m==="egal")); all();}
-function wz(k){return mode==="cap"? D.poids.zones[k] : 1/3;}
-function all(){G=D.monde[mode]; renderSummary(); renderQuad(); renderDyn(); renderHist(); renderAlloc(); renderValBond();}
+function setMode(m){mode=m; $("wcap").setAttribute("aria-pressed",String(m==="capi")); $("weq").setAttribute("aria-pressed",String(m==="egal")); all();}
+function all(){G=D.monde[mode]; renderSummary(); renderQuad(); renderDyn(); renderHist(); renderAlloc(); renderValBond(); renderTest();}
 function renderStatic(){renderVal(); renderZones(); renderRisk(); renderSources();}
 
 /* ================= Alertes ================= */
 function renderAlerts(){
-  var box=$("alerts"), h="";
-  if(D.simule) h+='<div class="notice bad"><strong>Données simulées.</strong> Ce jeu de données sert uniquement à tester l\'affichage ; aucune valeur ne reflète la réalité.</div>';
-  var pb=(D.series||[]).filter(function(s){return s.statut&&s.statut!=="ok";});
-  var msgs=(D.alertes||[]).map(esc);
-  pb.forEach(function(s){msgs.push('<strong>'+esc(GROUPES[s.groupe]||s.groupe)+' · '+esc(s.libelle)+'</strong> ('+STATUT[s.statut]+', dernière donnée : '+dateSerie(s)+')'+(s.message?' : '+esc(s.message):''));});
-  if(msgs.length) h+='<div class="notice"><strong>Points d\'attention sur les données</strong><ul>'+msgs.map(function(m){return "<li>"+m+"</li>";}).join("")+'</ul></div>';
+  var box=$("alerts"), h="", msgs=[];
+  (D.sources||[]).forEach(function(s){var st=statSrc(s); if(st.c==="ok") return;
+    msgs.push('<strong>'+esc(s.groupe)+' · '+esc(s.serie)+'</strong> ('+st.t.toLowerCase()+', dernière donnée : '+dateSrc(s)+')'+(st.c==="secours"?' : '+esc(s.statut)+(s.erreur?' ['+esc(s.erreur)+']':''):''));});
+  if(msgs.length) h+='<div class="notice'+((D.sources_en_echec||[]).length?' bad':'')+'"><strong>Points d\'attention sur les données</strong><ul>'+msgs.map(function(m){return "<li>"+m+"</li>";}).join("")+'</ul></div>';
   box.innerHTML=h;
 }
-function serieOf(groupe,ind){return (D.series||[]).filter(function(s){return s.groupe===groupe&&s.indicateur===ind;})[0];}
-function badge(s){return s&&s.statut&&s.statut!=="ok"?' <span class="status '+s.statut+'">'+STATUT[s.statut]+'</span>':'';}
 
 /* ================= Contributions et phrase automatique ================= */
-var IND=COMP.map(function(c){return {k:c.k,label:c.label,art:c.art,zone:true};}).concat(RISK.map(function(r){return {k:r.k,label:r.label,art:r.art,zone:false};}));
+function bloc(sc){return sc==="w"? G : D.zones[sc];}
 function contribs(h,sc){
-  var w={}; ZK.forEach(function(k){w[k]= sc==="w"? wz(k) : (sc===k?1:0);});
-  return IND.map(function(ind){var c=0;
-    if(ind.zone){var pw=D.poids.indicateurs[ind.k]; ZK.forEach(function(k){if(!w[k]) return; var s=D.zones[k].sous_scores[ind.k]; c+=w[k]*pw*(h==="lvl"? s[L]-50 : s[L]-s[L-h]);});}
-    else {var s=D.risque.sous_scores[ind.k]; c=D.poids.risque[ind.k]*(h==="lvl"? s[L]-50 : s[L]-s[L-h]);}
-    return {label:ind.label,art:ind.art,v:c};});
+  var b=bloc(sc), src= h==="lvl"? b.niveau : b.variations[h+"m"], libs=D.libelles.indicateurs;
+  return (src.contributions||[]).map(function(c){
+    var lab= sc==="w" ? c.libelle : libs[c.indicateur]||c.libelle;
+    return {label:lab, v:c.contribution, zone:c.zone};});
 }
-function scoreOf(sc){return sc==="w"? G.score : D.zones[sc].score;}
+function target(h,sc){var b=bloc(sc); return h==="lvl"? b.niveau.ecart_a_50 : b.variations[h+"m"].variation;}
 function phrase(h,sc){
-  var cs=contribs(h,sc), s=scoreOf(sc), name= sc==="w"?"le score mondial":"le score "+(sc==="ea"?"de la zone euro":sc==="us"?"des États-Unis":"du Japon");
-  var sorted=cs.slice().sort(function(a,b){return Math.abs(b.v)-Math.abs(a.v);});
+  var cs=contribs(h,sc), b=bloc(sc), name= sc==="w"?"le score mondial":"le score "+ZDE[sc];
+  var sorted=cs.slice().sort(function(a,c){return Math.abs(c.v)-Math.abs(a.v);});
   var up=sorted.filter(function(c){return c.v>=0.05;}), dn=sorted.filter(function(c){return c.v<=-0.05;});
-  function nm(c){return c.art+" ("+sg(c.v,1)+")";}
+  function nm(c){return low1(c.label)+" ("+sg(c.v,1)+")";}
   var A=up[0], B=dn[0], t;
-  if(h==="lvl"){var v=s[L], e=v-50;
+  if(h==="lvl"){var v=b.score, e=b.niveau.ecart_a_50;
     t=cap1(name)+" est à <strong>"+fx(v,0)+"</strong>, soit "+fx(Math.abs(e),1)+" "+pts(e)+" "+(e>=0?"au-dessus":"au-dessous")+" de la neutralité (50)";
     t+= A&&B ? ", soutenu par "+nm(A)+", pénalisé par "+nm(B)+"." : A ? ", soutenu par "+nm(A)+", sans facteur pénalisant notable." : B ? ", pénalisé par "+nm(B)+", sans soutien notable." : ".";
-  } else {var d=s[L]-s[L-h], hl=h===1?"un mois":h===3?"trois mois":"douze mois";
+  } else {var d=target(h,sc), hl=h===1?"un mois":h===3?"trois mois":"douze mois";
     t="Sur "+hl+", "+name+" a varié de <strong>"+sg(d,1)+" "+pts(d)+"</strong>";
     t+= A&&B ? ", porté par "+nm(A)+", freiné par "+nm(B)+"." : A ? ", porté par "+nm(A)+", sans frein notable." : B ? ", freiné par "+nm(B)+", sans soutien notable." : ", sans mouvement notable.";
   }
   return {text:t, cs:cs, sorted:sorted};
 }
-function cap1(t){return t.charAt(0).toUpperCase()+t.slice(1);}
 
 /* ================= Synthèse ================= */
 function renderSummary(){
-  $("asof").textContent="Mois de référence : "+mlong(D.dates[L])+" · collecte du "+new Date(D.genere_le).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+".";
-  var g=G.score[L], st=state(g);
+  $("asof").textContent="Mois de référence : "+mlong(M)+" · collecte du "+new Date(D.genere_le).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+".";
+  var g=G.score, st=state(g);
   $("gScore").innerHTML=fx(g,0)+"<small>/100</small>";
   $("gPill").innerHTML='<span class="pill '+st.c+'">Climat '+st.t.toLowerCase()+'</span>';
-  [1,3,12].forEach(function(h){var d=g-G.score[L-h], e=$("d"+h); e.textContent=sg(d,1)+" pt"; e.className=dcls(d);});
+  [1,3,12].forEach(function(h){var d=G.variations[h+"m"].variation, e=$("d"+h); e.textContent=sg(d,1)+" pt"; e.className=dcls(d);});
   $("gPhrase").innerHTML=phrase(3,"w").text;
-  var pz=D.poids.zones;
-  $("wNote").textContent= mode==="cap" ? "Pondération par capitalisation : États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ea*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %. Le score mondial reflète surtout les États-Unis." : "Pondération égale : chaque zone compte pour un tiers. Lecture plus économique que financière.";
+  var pz=D.parametres.ponderations.capi;
+  $("wNote").textContent= mode==="capi" ? "Pondération par capitalisation : États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ez*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %. Le score mondial reflète surtout les États-Unis." : "Pondération égale : chaque zone compte pour un tiers. Lecture plus économique que financière.";
   drawGauge($("gauge"),g);
-  var r=REG[G.regime[L]];
-  $("regChip").innerHTML='<span class="regime-chip"><i style="background:var('+r.col+')"></i>Régime mondial : '+r.name+'</span>';
-  $("regText").innerHTML=r.def+" (croissance "+fx(G.croissance[L],0)+"/100, inflation "+fx(G.inflation[L],1)+" %). Actifs favorisés : <strong>"+r.assets.toLowerCase()+"</strong>.";
-  setBar("eq",D.valorisation.attrait_actions[L]); setBar("bd",G.attrait_oblig[L]);
-  var a=G.allocation.finale;
+  var r=REG[G.regime];
+  $("regChip").innerHTML='<span class="regime-chip"><i style="background:var('+r.col+')"></i>Régime mondial : '+G.regime+'</span>';
+  $("regText").innerHTML=r.def+" (croissance "+fx(G.croissance,0)+"/100, inflation "+fx(G.inflation,1)+" %). Actifs favorisés : <strong>"+r.assets.toLowerCase()+"</strong>."+(G.regime_confirme&&G.regime_confirme!==G.regime?' <span class="muted">Régime confirmé sur deux mois : '+G.regime_confirme+'.</span>':'');
+  setBar("eq",D.valorisation.attrait_actions); setBar("bd",D.valorisation.attrait_obligations[mode]);
+  var a=arr(G.allocation.brut.finale);
   $("aTitle").textContent=allocTitle(a);
   stack("aStackMini",a,true);
-  var rk=ranked();
-  $("aText").innerHTML="Zone à privilégier : <strong>"+ZN[rk[0]]+"</strong>. Zone la plus fragile : <strong>"+ZN[rk[2]]+"</strong>.";
+  var pg=D.preference_geographique||[];
+  if(pg.length) $("aText").innerHTML="Zone à privilégier : <strong>"+esc(pg[0].nom)+"</strong>. Zone la plus fragile : <strong>"+esc(pg[pg.length-1].nom)+"</strong>.";
 }
 function setBar(p,v){var f=$(p+"Fill"); f.style.width=Math.max(0,Math.min(100,v))+"%"; f.style.background="var(--"+state(v).c+")"; $(p+"Val").textContent=fx(v,0);}
 function drawGauge(box,v){
@@ -518,24 +579,26 @@ function drawGauge(box,v){
 /* ================= Quadrant des régimes (Chart.js) ================= */
 var quadChart=null;
 function renderQuad(){
-  var ents=ZK.map(function(k){return {name:ZN[k], col:css(ZC[k]), g:D.zones[k].croissance, inf:D.zones[k].brut.infl, r:6};});
-  ents.push({name:"Monde", col:css("--glob"), g:G.croissance, inf:G.inflation, r:8});
+  var ents=ZK.map(function(k){return {name:ZN[k], col:css(ZC[k]), t:D.zones[k].trajectoire_6m||[], r:6};});
+  ents.push({name:"Monde", col:css("--glob"), t:G.trajectoire_6m||[], r:8});
   var xs=[],ys=[];
-  var ds=ents.map(function(e){var pts=[]; for(var i=Math.max(0,L-6);i<=L;i++){if(e.g[i]===null||e.inf[i]===null) continue; pts.push({x:e.g[i],y:e.inf[i],i:i}); xs.push(e.g[i]); ys.push(e.inf[i]);}
+  var ds=ents.map(function(e){var pts=[]; e.t.forEach(function(p){if(p.croissance===null||p.inflation===null) return; pts.push({x:p.croissance,y:p.inflation,m:p.mois}); xs.push(p.croissance); ys.push(p.inflation);});
     return {label:e.name, data:pts, showLine:true, borderColor:alpha(e.col,.5), borderWidth:1.5, backgroundColor:pts.map(function(p,j){return j===pts.length-1?e.col:alpha(e.col,.5);}),
       pointRadius:pts.map(function(p,j){return j===pts.length-1?e.r:2.5;}), pointHoverRadius:pts.map(function(p,j){return j===pts.length-1?e.r+2:5;}),
       pointBorderColor:pts.map(function(p,j){return j===pts.length-1?css("--surface"):"transparent";}), pointBorderWidth:2, _col:e.col};});
+  if(!xs.length){xs=[50]; ys=[2.5];}
   var x0=Math.min(20,Math.floor(Math.min.apply(null,xs)/10)*10), x1=Math.max(80,Math.ceil(Math.max.apply(null,xs)/10)*10);
   var y0=Math.min(-1,Math.floor(Math.min.apply(null,ys))), y1=Math.max(6,Math.ceil(Math.max.apply(null,ys)));
+  var SC=D.parametres.seuil_croissance, SI=D.parametres.seuil_inflation;
   var bg={id:"quadBg", beforeDatasetsDraw:function(ch){var c=ch.ctx, X=ch.scales.x, Y=ch.scales.y, a=ch.chartArea;
-      var q=[[50,x1,y0,2.5,"expansion"],[50,x1,2.5,y1,"surchauffe"],[x0,50,y0,2.5,"ralentissement"],[x0,50,2.5,y1,"stagflation"]];
+      var q=[[SC,x1,y0,SI,"Expansion"],[SC,x1,SI,y1,"Surchauffe"],[x0,SC,y0,SI,"Ralentissement"],[x0,SC,SI,y1,"Stagflation"]];
       c.save();
       q.forEach(function(r){var col=css(REG[r[4]].col), l=X.getPixelForValue(r[0]), rr=X.getPixelForValue(r[1]), t=Y.getPixelForValue(r[3]), b=Y.getPixelForValue(r[2]);
         c.fillStyle=alpha(col,.08); c.fillRect(l,t,rr-l,b-t);
-        c.fillStyle=col; c.font='600 12px "IBM Plex Sans", system-ui, sans-serif'; c.textAlign=r[0]===50?"right":"left";
-        c.fillText(REG[r[4]].name, r[0]===50? rr-8 : l+8, r[2]===y0? b-8 : t+16);});
+        c.fillStyle=col; c.font='600 12px "IBM Plex Sans", system-ui, sans-serif'; c.textAlign=r[0]===SC?"right":"left";
+        c.fillText(r[4], r[0]===SC? rr-8 : l+8, r[2]===y0? b-8 : t+16);});
       c.strokeStyle=css("--muted"); c.setLineDash([4,4]); c.lineWidth=1;
-      c.beginPath(); c.moveTo(X.getPixelForValue(50),a.top); c.lineTo(X.getPixelForValue(50),a.bottom); c.moveTo(a.left,Y.getPixelForValue(2.5)); c.lineTo(a.right,Y.getPixelForValue(2.5)); c.stroke();
+      c.beginPath(); c.moveTo(X.getPixelForValue(SC),a.top); c.lineTo(X.getPixelForValue(SC),a.bottom); c.moveTo(a.left,Y.getPixelForValue(SI)); c.lineTo(a.right,Y.getPixelForValue(SI)); c.stroke();
       c.restore();},
     afterDatasetsDraw:function(ch){var c=ch.ctx; c.save(); c.font='600 12px "IBM Plex Sans", system-ui, sans-serif'; c.lineWidth=3; c.strokeStyle=css("--surface"); c.lineJoin="round";
       var labs=[];
@@ -552,31 +615,33 @@ function renderQuad(){
     options:{responsive:true, maintainAspectRatio:false, layout:{padding:{right:6}},
       scales:{x:{min:x0,max:x1,title:{display:true,text:"Croissance (score de 0 à 100)",color:tc},ticks:{color:tc,stepSize:10},grid:{color:alpha(gc,.6)}},
               y:{min:y0,max:y1,title:{display:true,text:"Inflation sur un an",color:tc},ticks:{color:tc,stepSize:1,callback:function(v){return fx(v,0)+" %";}},grid:{color:alpha(gc,.6)}}},
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:function(c){var p=c.raw; return c.dataset.label+", "+mlab(D.dates[p.i])+" : croissance "+fx(p.x,0)+", inflation "+fx(p.y,1)+" %";}}}}}});
-  $("quadLegend").innerHTML='<span>Point plein : '+mlab(D.dates[L])+'</span><span>Traînée : 6 mois précédents</span><span>Pointillés : seuils (croissance 50, inflation 2,5 %)</span>';
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:function(c){var p=c.raw; return c.dataset.label+", "+mlab(p.m)+" : croissance "+fx(p.x,0)+", inflation "+fx(p.y,1)+" %";}}}}}});
+  $("quadLegend").innerHTML='<span>Point plein : '+mlab(M)+'</span><span>Traînée : 6 mois précédents</span><span>Pointillés : seuils (croissance '+fx(SC,0)+', inflation '+fx(SI,1)+' %)</span>';
   var tb=$("regTable"); tb.innerHTML="";
-  RK.forEach(function(code){var r=REG[code], who=ZK.filter(function(k){return D.zones[k].regime[L]===code;}).map(function(k){return ZN[k];});
-    if(G.regime[L]===code) who.unshift("Monde");
-    tb.appendChild(el("tr",G.regime[L]===code?{style:"background:var(--band)"}:null,'<td><span class="regime-chip" style="padding:3px 8px"><i style="background:var('+r.col+')"></i>'+r.name+'</span>'+(who.length?'<div class="small muted" style="margin-top:4px">'+who.join(", ")+'</div>':'')+'</td><td>'+r.def+'</td><td>'+r.assets+'</td>'));});
+  RK.forEach(function(code){var r=REG[code], who=ZK.filter(function(k){return D.zones[k].regime===code;}).map(function(k){return ZN[k];});
+    if(G.regime===code) who.unshift("Monde");
+    tb.appendChild(el("tr",G.regime===code?{style:"background:var(--band)"}:null,'<td><span class="regime-chip" style="padding:3px 8px"><i style="background:var('+r.col+')"></i>'+code+'</span>'+(who.length?'<div class="small muted" style="margin-top:4px">'+who.join(", ")+'</div>':'')+'</td><td>'+r.def+'</td><td>'+r.assets+'</td>'));});
 }
 
 /* ================= Valorisation ================= */
 function lab(v,a,b,c){v=Math.round(v); return v>=65?a:v>=35?b:c;}
 function renderVal(){
-  var V=D.valorisation, e=V.attrait_actions[L], se=state(e), sc=serieOf("valorisation","cape"), st=serieOf("valorisation","tips");
+  var V=D.valorisation, e=V.attrait_actions, se=state(e), sc=src("cape"), st=src("dfii10");
+  var h=V.historique_attrait_actions, hv=[];
+  if(h) h.dates.forEach(function(d,i){if(d>="2016-01") hv.push(h.valeurs[i]);});
   var box=$("valCards"); box.innerHTML="";
   box.appendChild(el("div",{class:"card stripe",style:"--s:var(--"+se.c+")"},'<h3>Attrait des actions</h3><div class="small muted">Prime de risque : rendement bénéficiaire du PER de Shiller moins taux réel 10 ans (États-Unis)</div><div class="rv">'+fx(e,0)+'<span class="small muted"> /100</span></div><span class="pill '+se.c+'">'+lab(e,"Actions bon marché","Valorisation normale","Actions chères")+'</span>'
-    +'<div class="kv" style="margin-top:12px"><span>PER de Shiller</span><span>'+fx(V.cape[L],1)+'</span><span>Rendement 1 / PER</span><span>'+fx(100/V.cape[L],2)+' %</span><span>Taux réel 10 ans US</span><span>'+fx(V.taux_reel_us[L],2)+' %</span><span>Prime de risque</span><span>'+fx(V.prime[L],2)+' pt</span></div>'
-    +'<div style="margin-top:10px">'+spark(V.prime,"--"+se.c)+'</div><div class="small muted">Prime de risque, 2016 à '+mlab(D.dates[L])+'</div>'
-    +'<div class="small muted" style="margin-top:6px">Dernières données : CAPE '+dateSerie(sc)+badge(sc)+' · TIPS '+dateSerie(st)+badge(st)+'</div>'));
+    +'<div class="kv" style="margin-top:12px"><span>PER de Shiller</span><span>'+fx(V.cape,1)+'</span><span>Rendement 1 / PER</span><span>'+fx(100/V.cape,2)+' %</span><span>Taux réel 10 ans US</span><span>'+fx(V.taux_reels_10a.us,2)+' %</span><span>Prime de risque</span><span>'+fx(V.prime_de_risque_actions,2)+' pt</span></div>'
+    +'<div style="margin-top:10px">'+spark(hv,"--"+se.c)+'</div><div class="small muted">Attrait des actions (0-100), janvier 2016 à '+mlab(M)+'</div>'
+    +'<div class="small muted" style="margin-top:6px">Dernières données : CAPE '+dateSrc(sc)+badge(sc)+' · TIPS '+dateSrc(st)+badge(st)+'</div>'));
   box.appendChild(el("div",{class:"card stripe",id:"bondCard"}));
   box.appendChild(el("div",{class:"card",id:"verdictCard"}));
 }
 function renderValBond(){
-  var e=D.valorisation.attrait_actions[L], b=G.attrait_oblig[L], sb=state(b);
-  var rows=ZK.map(function(k){return '<span>'+ZN[k]+'</span><span>'+fx(D.zones[k].taux_reel[L],2)+' % · '+fx(D.zones[k].attrait_oblig[L],0)+'</span>';}).join("");
+  var V=D.valorisation, e=V.attrait_actions, b=V.attrait_obligations[mode], sb=state(b);
+  var rows=ZK.map(function(k){return '<span>'+ZN[k]+'</span><span>'+fx(V.taux_reels_10a[k],2)+' % · '+fx(V.attrait_obligations_zones[k],0)+'</span>';}).join("");
   var c=$("bondCard"); c.style.setProperty("--s","var(--"+sb.c+")");
-  c.innerHTML='<h3>Attrait des obligations</h3><div class="small muted">Taux réel à 10 ans : plus il est élevé, plus les obligations rémunèrent l\'investisseur au-delà de l\'inflation</div><div class="rv">'+fx(b,0)+'<span class="small muted"> /100 · '+(mode==="cap"?"pondération capi":"pondération égale")+'</span></div><span class="pill '+sb.c+'">'+lab(b,"Obligations attractives","Attrait moyen","Obligations peu rémunératrices")+'</span><div class="kv" style="margin-top:12px"><span class="muted">Zone</span><span class="muted">taux réel · score</span>'+rows+'</div><p class="small muted" style="margin:10px 0 0">États-Unis : obligations indexées (TIPS). Zone euro et Japon : taux nominal 10 ans moins inflation constatée.</p>';
+  c.innerHTML='<h3>Attrait des obligations</h3><div class="small muted">Taux réel à 10 ans : plus il est élevé, plus les obligations rémunèrent l\'investisseur au-delà de l\'inflation</div><div class="rv">'+fx(b,0)+'<span class="small muted"> /100 · '+(mode==="capi"?"pondération capi":"pondération égale")+'</span></div><span class="pill '+sb.c+'">'+lab(b,"Obligations attractives","Attrait moyen","Obligations peu rémunératrices")+'</span><div class="kv" style="margin-top:12px"><span class="muted">Zone</span><span class="muted">taux réel · score</span>'+rows+'</div><p class="small muted" style="margin:10px 0 0">États-Unis : obligations indexées (TIPS). Zone euro et Japon : taux nominal 10 ans moins inflation constatée.</p>';
   var verdict, vt;
   if(Math.round(e)<35&&Math.round(b)>=50){verdict="Actions chères, obligations rémunératrices : le couple rendement / risque penche vers les obligations."; vt="warn";}
   else if(Math.round(e)<35){verdict="Actions chères et obligations peu rémunératrices : peu d'actifs bon marché, la prudence et les liquidités gagnent en intérêt."; vt="bad";}
@@ -584,47 +649,50 @@ function renderValBond(){
   else {verdict="Valorisations dans leur zone normale : l'allocation suit le régime et le climat."; vt="good";}
   $("verdictCard").innerHTML='<h3>Ce que ça change</h3><p style="margin:10px 0"><span class="pill '+vt+'">Lecture</span></p><p style="margin:0">'+verdict+'</p><p class="small muted" style="margin:12px 0 0">Règle appliquée à l\'allocation : attrait actions inférieur à 35, actions −10 points ; supérieur à 65, actions +5 points. La contrepartie va aux obligations si leur attrait atteint 50, sinon aux liquidités.</p>';
 }
-function spark(a,col){var w=200,h=44,lo=Infinity,hi=-Infinity,i,pts=[]; for(i=S0;i<=L;i++){if(a[i]===null) continue; lo=Math.min(lo,a[i]);hi=Math.max(hi,a[i]); pts.push(i);}
-  if(!pts.length) return "";
-  function X(i){return (i-S0)/((L-S0)||1)*w;} function Y(v){return h-3-(v-lo)/(hi-lo||1)*(h-6);}
-  var d=pts.map(function(i,j){return (j?"L":"M")+X(i).toFixed(1)+" "+Y(a[i]).toFixed(1);}).join(""); var f=d+"L"+X(pts[pts.length-1]).toFixed(1)+" "+h+"L"+X(pts[0]).toFixed(1)+" "+h+"Z";
+function spark(a,col){var w=200,h=44,lo=Infinity,hi=-Infinity,i,idx=[]; for(i=0;i<a.length;i++){if(a[i]===null||a[i]===undefined) continue; lo=Math.min(lo,a[i]);hi=Math.max(hi,a[i]); idx.push(i);}
+  if(!idx.length) return "";
+  function X(i){return i/((a.length-1)||1)*w;} function Y(v){return h-3-(v-lo)/(hi-lo||1)*(h-6);}
+  var d=idx.map(function(i,j){return (j?"L":"M")+X(i).toFixed(1)+" "+Y(a[i]).toFixed(1);}).join(""); var f=d+"L"+X(idx[idx.length-1]).toFixed(1)+" "+h+"L"+X(idx[0]).toFixed(1)+" "+h+"Z";
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><path d="'+f+'" fill="var('+col+')" fill-opacity=".10"/><path d="'+d+'" fill="none" stroke="var('+col+')" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';}
 
 /* ================= Dynamique ================= */
 var hz=3, scope="w";
 function renderDyn(){
   var P=phrase(hz,scope), cs=P.cs, sorted=P.sorted, tot=cs.reduce(function(a,b){return a+b.v;},0);
-  var mx=Math.max.apply(null,cs.map(function(c){return Math.abs(c.v);}))||1;
+  var shown=sorted, rest=[];
+  if(sorted.length>10){shown=sorted.filter(function(c){return Math.abs(c.v)>=0.05;}); rest=sorted.filter(function(c){return Math.abs(c.v)<0.05;});}
+  if(rest.length) shown=shown.concat([{label:"Autres ("+rest.length+" sous-scores, chacun < 0,05)", v:rest.reduce(function(a,b){return a+b.v;},0)}]);
+  var mx=Math.max.apply(null,shown.map(function(c){return Math.abs(c.v);}))||1;
   var box=$("contribs"); box.innerHTML="";
-  sorted.forEach(function(c){var wpc=Math.abs(c.v)/mx*50, pos=c.v>=0;
-    box.appendChild(el("div",{class:"contrib"},'<span>'+c.label+'</span><div class="cbar"><div class="axis"></div><div class="b" style="'+(pos?'left:50%':'right:50%')+';width:'+wpc+'%;background:var(--'+(pos?'good':'bad')+')"></div></div><span class="cval">'+sg(c.v,1)+'</span>'));});
+  shown.forEach(function(c){var wpc=Math.abs(c.v)/mx*50, pos=c.v>=0;
+    box.appendChild(el("div",{class:"contrib"},'<span>'+esc(c.label)+'</span><div class="cbar"><div class="axis"></div><div class="b" style="'+(pos?'left:50%':'right:50%')+';width:'+wpc+'%;background:var(--'+(pos?'good':'bad')+')"></div></div><span class="cval">'+sg(c.v,1)+'</span>'));});
   $("dynText").innerHTML=P.text;
   $("dynNote").textContent= hz==="lvl" ? "Contribution = poids de la zone × poids de l'indicateur × (sous-score − 50), en points de score. La somme des barres égale l'écart du score à 50." : "Contribution = poids de la zone × poids de l'indicateur × variation du sous-score, en points de score. La somme des barres égale la variation du score.";
-  var s=scoreOf(scope), target= hz==="lvl"? s[L]-50 : s[L]-s[L-hz], gap=Math.abs(tot-target), ck=$("dynCheck");
+  var tg=target(hz,scope), gap=Math.abs(tot-tg), ck=$("dynCheck");
   ck.className="check "+(gap<=0.05?"ok":"ko");
-  ck.textContent= gap<=0.05 ? "Contrôle : somme des contributions "+sg(tot,2)+" = "+(hz==="lvl"?"écart à 50":"variation du score")+" "+sg(target,2)+"." : "Écart de contrôle : somme des contributions "+sg(tot,2)+" contre "+sg(target,2)+" ("+fx(gap,2)+" pt). Vérifier le calcul dans le script de collecte.";
+  ck.textContent= gap<=0.05 ? "Contrôle : somme des contributions "+sg(tot,2)+" = "+(hz==="lvl"?"écart à 50":"variation du score")+" "+sg(tg,2)+"." : "Écart de contrôle : somme des contributions "+sg(tot,2)+" contre "+sg(tg,2)+" ("+fx(gap,2)+" pt). Vérifier le calcul dans le script de collecte.";
   var vt=$("varTable"); vt.innerHTML="";
-  var rows=[{n:"Monde",s:G.score,col:"--glob"}].concat(ZK.map(function(k){return {n:ZN[k],s:D.zones[k].score,col:ZC[k]};}));
-  rows.forEach(function(r){function c(h){var d=r.s[L]-r.s[L-h]; return '<td class="n '+dcls(d)+'">'+sg(d,1)+'</td>';}
-    vt.appendChild(el("tr",null,'<td style="white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var('+r.col+');margin-right:8px"></span>'+r.n+'</td><td class="n">'+fx(r.s[L],0)+'</td>'+c(1)+c(3)+c(12)));});
+  var rows=[{n:"Monde",b:G,col:"--glob"}].concat(ZK.map(function(k){return {n:ZN[k],b:D.zones[k],col:ZC[k]};}));
+  rows.forEach(function(r){function c(h){var d=r.b.variations[h+"m"].variation; return '<td class="n '+dcls(d)+'">'+sg(d,1)+'</td>';}
+    vt.appendChild(el("tr",null,'<td style="white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var('+r.col+');margin-right:8px"></span>'+r.n+'</td><td class="n">'+fx(r.b.score,0)+'</td>'+c(1)+c(3)+c(12)));});
 }
 
 /* ================= Historique (Chart.js) ================= */
 var histChart=null;
-var SERIES=[{key:"w",name:"Monde",color:"--glob",width:2.6,on:true},{key:"us",name:"États-Unis",color:"--us",width:1.5,on:true},{key:"ea",name:"Zone euro",color:"--ea",width:1.5,on:true},{key:"jp",name:"Japon",color:"--jp",width:1.5,on:true}];
-function sdata(k){return k==="w"?G.score:D.zones[k].score;}
+var SERIES=[{key:"w",name:"Monde",color:"--glob",width:2.6,on:true},{key:"us",name:"États-Unis",color:"--us",width:1.5,on:true},{key:"ez",name:"Zone euro",color:"--ea",width:1.5,on:true},{key:"jp",name:"Japon",color:"--jp",width:1.5,on:true}];
 function renderLegend(){var lg=$("legend"); lg.innerHTML="";
-  SERIES.forEach(function(s,j){var b=el("button",{type:"button","aria-pressed":String(s.on)},'<i style="background:var('+s.color+')"></i>'+s.name+(s.key==="w"?(mode==="cap"?" (capi)":" (égale)"):""));
+  SERIES.forEach(function(s,j){var b=el("button",{type:"button","aria-pressed":String(s.on)},'<i style="background:var('+s.color+')"></i>'+s.name+(s.key==="w"?(mode==="capi"?" (capi)":" (égale)"):""));
     b.addEventListener("click",function(){s.on=!s.on; b.setAttribute("aria-pressed",String(s.on)); if(histChart){histChart.setDatasetVisibility(j,s.on); histChart.update();}}); lg.appendChild(b);});
-  RK.forEach(function(c){lg.appendChild(el("span",{class:"small muted",style:"display:inline-flex;align-items:center;gap:6px;margin-left:4px"},'<i style="width:12px;height:8px;border-radius:2px;background:var('+REG[c].col+')"></i>'+REG[c].name));});}
+  RK.forEach(function(c){lg.appendChild(el("span",{class:"small muted",style:"display:inline-flex;align-items:center;gap:6px;margin-left:4px"},'<i style="width:12px;height:8px;border-radius:2px;background:var('+REG[c].col+')"></i>'+c));});}
 function renderHist(){
   renderLegend();
   if(!window.Chart){$("histBox").innerHTML='<p class="small muted">Graphique indisponible (bibliothèque Chart.js non chargée).</p>'; return;}
-  var labels=D.dates.slice(S0,L+1), narrow=$("histBox").clientWidth<560;
+  var labels=months("2016-01",M), narrow=$("histBox").clientWidth<560;
   $("histBox").style.height=(narrow?320:380)+"px";
-  var ds=SERIES.map(function(s){var a=sdata(s.key).slice(S0,L+1); return {label:s.name, data:a, borderColor:css(s.color), backgroundColor:css(s.color), borderWidth:s.width, pointRadius:0, pointHoverRadius:4, tension:.15, hidden:!s.on, spanGaps:false};});
-  var all=[]; ds.forEach(function(d){d.data.forEach(function(v){if(v!==null) all.push(v);});});
-  var ymin=Math.min(20,Math.floor(Math.min.apply(null,all)/10)*10), ymax=Math.max(80,Math.ceil(Math.max.apply(null,all)/10)*10);
+  var regs=histMap(G.historique_regime);
+  var ds=SERIES.map(function(s){var hm=histMap(s.key==="w"?G.historique:D.zones[s.key].historique); var a=labels.map(function(d){return hm[d]===undefined?null:hm[d];}); return {label:s.name, data:a, borderColor:css(s.color), backgroundColor:css(s.color), borderWidth:s.width, pointRadius:0, pointHoverRadius:4, tension:.15, hidden:!s.on, spanGaps:false};});
+  var vals=[]; ds.forEach(function(d){d.data.forEach(function(v){if(v!==null) vals.push(v);});});
+  var ymin=Math.min(20,Math.floor(Math.min.apply(null,vals)/10)*10), ymax=Math.max(80,Math.ceil(Math.max.apply(null,vals)/10)*10);
   var RIB=12;
   var deco={id:"deco",
     beforeDatasetsDraw:function(ch){var c=ch.ctx, X=ch.scales.x, Y=ch.scales.y, a=ch.chartArea; c.save();
@@ -634,7 +702,7 @@ function renderHist(){
       [40,60].forEach(function(v){var y=Y.getPixelForValue(v); c.beginPath(); c.moveTo(a.left,y); c.lineTo(a.right,y); c.stroke();});
       c.restore();},
     afterDraw:function(ch){var c=ch.ctx, X=ch.scales.x, a=ch.chartArea, n=labels.length, bw=(a.right-a.left)/Math.max(1,n-1), y=a.bottom+6; c.save();
-      for(var i=0;i<n;i++){var rg=G.regime[S0+i]; if(!rg) continue; c.fillStyle=alpha(css(REG[rg].col),.85); var x=X.getPixelForValue(i); c.fillRect(x-bw/2,y,bw+.6,RIB);}
+      for(var i=0;i<n;i++){var rg=regs[labels[i]]; if(!rg||!REG[rg]) continue; c.fillStyle=alpha(css(REG[rg].col),.85); var x=X.getPixelForValue(i); c.fillRect(x-bw/2,y,bw+.6,RIB);}
       c.restore();}};
   if(histChart) histChart.destroy();
   var tc=css("--muted"), gc=css("--line");
@@ -644,62 +712,110 @@ function renderHist(){
               y:{min:ymin,max:ymax,ticks:{color:tc,stepSize:10},grid:{color:alpha(gc,.7)}}},
       plugins:{legend:{display:false},
         tooltip:{itemSort:function(a,b){return a.datasetIndex-b.datasetIndex;}, callbacks:{title:function(it){return mlong(labels[it[0].dataIndex]);}, label:function(c){return c.dataset.label+" : "+fx(c.raw,0);},
-          footer:function(it){var rg=G.regime[S0+it[0].dataIndex]; return rg?"Régime mondial : "+REG[rg].name:"";}}}}}});
+          footer:function(it){var rg=regs[labels[it[0].dataIndex]]; return rg?"Régime mondial : "+rg:"";}}}}}});
 }
 
 /* ================= Zones ================= */
 function bar(s){var st=state(s); return '<div class="track"><div class="fill" style="width:'+Math.max(0,Math.min(100,s))+'%;background:var(--'+st.c+')"></div><div class="mid"></div></div>';}
+function socleScore(){var ss=D.zones.us.sous_scores; return (ss.vix+ss.credit+ss.gpr+ss.brent)/4;}
 function renderZones(){var box=$("zoneCards"); box.innerHTML="";
-  ZK.forEach(function(k){var z=D.zones[k], s=z.score[L], st=state(s), d3=s-z.score[L-3], rg=REG[z.regime[L]];
-    var h='<div class="zonehead"><div><div class="kicker">Zone</div><h3 style="font-size:18px">'+ZN[k]+'</h3><span class="regime-chip" style="padding:3px 8px;margin-top:6px;font-size:12px"><i style="background:var('+rg.col+')"></i>'+rg.name+'</span></div><div style="text-align:right"><div class="zscore">'+fx(s,0)+'</div><span class="pill '+st.c+'">'+st.t+'</span><div class="small '+dcls(d3)+'" style="margin-top:4px">'+sg(d3,1)+' pt sur 3 mois</div></div></div>';
-    COMP.forEach(function(c){var v=z.sous_scores[c.k][L], se=serieOf(k,c.k);
-      h+='<div class="comp"><span class="lab">'+c.label+' <span class="raw">('+c.fmt(z.brut[c.k][L])+')</span><span class="dt">'+(se?esc(se.libelle)+', '+esc(se.source)+' · dernière donnée '+dateSerie(se):'')+badge(se)+'</span></span><span class="sc">'+fx(v,0)+'</span>'+bar(v)+'</div>';});
-    h+='<div class="comp"><span class="lab">Socle de risque mondial <span class="raw">(20 %)</span></span><span class="sc">'+fx(D.risque.score[L],0)+'</span>'+bar(D.risque.score[L])+'</div>';
-    var tx=k==="us"?serieOf("valorisation","tips"):(D.series||[]).filter(function(s){return s.groupe==="valorisation"&&s.id&&s.id.indexOf(k+"_")===0;})[0];
-    h+='<div class="comp"><span class="lab">Hors score : attrait obligataire <span class="raw">(taux réel '+fx(z.taux_reel[L],2)+' %)</span>'+(tx?'<span class="dt">'+esc(tx.libelle)+' · dernière donnée '+dateSerie(tx)+'</span>':'')+'</span><span class="sc">'+fx(z.attrait_oblig[L],0)+'</span>'+bar(z.attrait_oblig[L])+'</div>';
+  ZK.forEach(function(k){var z=D.zones[k], s=z.score, st=state(s), d3=z.variations["3m"].variation, rg=REG[z.regime];
+    var h='<div class="zonehead"><div><div class="kicker">Zone</div><h3 style="font-size:18px">'+ZN[k]+'</h3><span class="regime-chip" style="padding:3px 8px;margin-top:6px;font-size:12px"><i style="background:var('+rg.col+')"></i>'+z.regime+'</span></div><div style="text-align:right"><div class="zscore">'+fx(s,0)+'</div><span class="pill '+st.c+'">'+st.t+'</span><div class="small '+dcls(d3)+'" style="margin-top:4px">'+sg(d3,1)+' pt sur 3 mois</div></div></div>';
+    COMP.forEach(function(c){var v=z.sous_scores[c.k], se=src(SRC[k][c.k]);
+      h+='<div class="comp"><span class="lab">'+c.label+' <span class="raw">('+c.raw(k)+')</span><span class="dt">'+(se?esc(se.serie)+', '+esc(se.source)+' · dernière donnée '+dateSrc(se):'')+badge(se)+'</span></span><span class="sc">'+fx(v,0)+'</span>'+bar(v)+'</div>';});
+    var sk=socleScore();
+    h+='<div class="comp"><span class="lab">Socle de risque mondial <span class="raw">(20 %)</span></span><span class="sc">'+fx(sk,0)+'</span>'+bar(sk)+'</div>';
+    var tx=src(SRC[k].taux), ao=D.valorisation.attrait_obligations_zones[k];
+    h+='<div class="comp"><span class="lab">Hors score : attrait obligataire <span class="raw">(taux réel '+fx(D.valorisation.taux_reels_10a[k],2)+' %)</span>'+(tx?'<span class="dt">'+esc(tx.serie)+' · dernière donnée '+dateSrc(tx)+'</span>':'')+badge(tx)+'</span><span class="sc">'+fx(ao,0)+'</span>'+bar(ao)+'</div>';
     box.appendChild(el("div",{class:"card zonecard",style:"--c:var("+ZC[k]+")"},h));});
 }
 
 /* ================= Risque ================= */
 function renderRisk(){var box=$("riskCards"); box.innerHTML="";
-  RISK.forEach(function(r){var s=D.risque.sous_scores[r.k][L], st=state(s), d3=s-D.risque.sous_scores[r.k][L-3], se=serieOf("socle",r.k), raw=D.risque.brut[r.k];
-    box.appendChild(el("div",{class:"card stripe",style:"--s:var(--"+st.c+")"},'<h3>'+r.label+'</h3><div class="small muted">'+r.sub+'</div><div class="rv">'+r.fmt(raw[L])+'</div><div class="row small"><span class="pill '+st.c+'">'+(Math.round(s)>=60?"Tension faible":Math.round(s)>=40?"Tension modérée":"Tension élevée")+'</span><span class="muted">sous-score '+fx(s,0)+'</span><span class="'+dcls(d3)+'">'+sg(d3,0)+' sur 3 mois</span></div><div style="margin-top:10px">'+spark(raw,"--"+st.c)+'</div><div class="small muted">2016 à '+mlab(D.dates[L])+(se?' · dernière donnée '+dateSerie(se)+' ('+esc(se.source)+' '+esc(se.code)+')':'')+badge(se)+'</div>'));});
+  var c3={}; D.zones.us.variations["3m"].contributions.forEach(function(c){if(c.zone==="socle") c3[c.indicateur]=c.contribution;});
+  var ms=months("2016-01",M);
+  RISK.forEach(function(r){var s=D.zones.us.sous_scores[r.k], st=state(s), w=D.parametres.poids_socle[r.k], d3=c3[r.k]!==undefined&&w? c3[r.k]/w : null, se=src(r.src);
+    var raw=ms.map(function(m){return r.val(m);});
+    box.appendChild(el("div",{class:"card stripe",style:"--s:var(--"+st.c+")"},'<h3>'+r.label+'</h3><div class="small muted">'+r.sub+'</div><div class="rv">'+r.fmt(r.val(M))+'</div><div class="row small"><span class="pill '+st.c+'">'+(Math.round(s)>=60?"Tension faible":Math.round(s)>=40?"Tension modérée":"Tension élevée")+'</span><span class="muted">sous-score '+fx(s,0)+'</span>'+(d3!==null?'<span class="'+dcls(d3)+'">'+sg(d3,0)+' sur 3 mois</span>':'')+'</div><div style="margin-top:10px">'+spark(raw,"--"+st.c)+'</div><div class="small muted">2016 à '+mlab(M)+(se?' · dernière donnée '+dateSrc(se)+' ('+esc(se.source)+')':'')+badge(se)+'</div>'));});
 }
 
 /* ================= Allocation ================= */
-function ranked(){return ZK.slice().sort(function(a,b){return D.zones[b].score[L]-D.zones[a].score[L];});}
 function allocTitle(a){var t= a[0]>=65?"Surpondérer les actions": a[0]>=55?"Proche de la référence 60 / 40": a[0]>=40?"Sous-pondérer modérément les actions":"Posture défensive"; return t+" ("+a[0]+" % actions)";}
-function stepLabel(s){
-  if(s.etape==="regime") return "1. Base du régime : "+REG[s.regime].name;
-  if(s.etape==="climat") return s.regle==="degrade"?"2. Climat dégradé ("+fx(s.valeur,0)+" < 40) : actions −10 vers liquidités" : s.regle==="favorable"?"2. Climat favorable ("+fx(s.valeur,0)+" ≥ 60) : actions +5" : "2. Climat neutre ("+fx(s.valeur,0)+") : pas d'ajustement";
-  if(s.etape==="valorisation") return s.regle==="cheres"?"3. Actions chères (attrait "+fx(s.valeur,0)+" < 35) : actions −10 vers "+(s.vers==="oblig"?"obligations":"liquidités") : s.regle==="bon_marche"?"3. Actions bon marché (attrait "+fx(s.valeur,0)+" > 65) : actions +5" : "3. Valorisation normale (attrait "+fx(s.valeur,0)+") : pas d'ajustement";
-  return esc(s.etape);
-}
 var LAB=["Actions","Oblig. d'État","Actifs réels","Liquidités"], COL=["var(--us)","var(--ea)","var(--real)","var(--muted)"];
 function stack(id,a,short){var h=""; a.forEach(function(p,i){if(p>0) h+='<div style="width:'+p+'%;background:'+COL[i]+'" title="'+LAB[i]+' '+p+' %">'+(!short&&p>=16?LAB[i]+" "+p+" %":p>=7?p+" %":"")+'</div>';}); $(id).innerHTML=h;}
 function renderAlloc(){
-  var al=G.allocation, tb=$("steps"); tb.innerHTML="";
-  al.etapes.forEach(function(st,j){var prev=j?al.etapes[j-1].repartition:null;
-    tb.appendChild(el("tr",null,'<td>'+stepLabel(st)+'</td>'+st.repartition.map(function(v,i){var d=prev?v-prev[i]:0; return '<td class="n">'+v+' %'+(d?' <span class="small '+dcls(d)+'">('+(d>0?"+":"−")+Math.abs(d)+')</span>':'')+'</td>';}).join("")));});
-  tb.appendChild(el("tr",{style:"background:var(--band)"},'<td><strong>Orientation retenue ('+(mode==="cap"?"pondération capi":"pondération égale")+')</strong></td>'+al.finale.map(function(v){return '<td class="n"><strong>'+v+' %</strong></td>';}).join("")));
-  stack("stackRef",[60,40,0,0]); stack("stackNow",al.finale);
-  var rk=ranked(), o=["Surpondérer","Neutre","Sous-pondérer"], tr=$("rank"); tr.innerHTML="";
-  rk.forEach(function(k,i){var z=D.zones[k], rg=REG[z.regime[L]], d3=z.score[L]-z.score[L-3];
-    tr.appendChild(el("tr",null,"<td class='num'>"+(i+1)+"</td><td style='white-space:nowrap'><span style='display:inline-block;width:10px;height:10px;border-radius:2px;background:var("+ZC[k]+");margin-right:8px'></span>"+ZN[k]+"</td><td><span class='regime-chip' style='padding:2px 7px;font-size:12px'><i style='background:var("+rg.col+")'></i>"+rg.name+"</span></td><td class='n'>"+fx(z.score[L],0)+"</td><td class='n "+dcls(d3)+"'>"+sg(d3,1)+"</td><td>"+o[i]+"</td>"));});
+  var al=G.allocation.brut, tb=$("steps"); tb.innerHTML="";
+  al.etapes.forEach(function(st,j){var cur=arr(st), prev=j?arr(al.etapes[j-1]):null;
+    tb.appendChild(el("tr",null,'<td>'+esc(st.etape)+'<div class="small muted">'+esc(st.motif)+'</div></td>'+cur.map(function(v,i){var d=prev?v-prev[i]:0; return '<td class="n">'+v+' %'+(d?' <span class="small '+dcls(d)+'">('+(d>0?"+":"−")+Math.abs(d)+')</span>':'')+'</td>';}).join("")));});
+  var fin=arr(al.finale);
+  tb.appendChild(el("tr",{style:"background:var(--band)"},'<td><strong>Orientation retenue ('+(mode==="capi"?"pondération capi":"pondération égale")+')</strong></td>'+fin.map(function(v){return '<td class="n"><strong>'+v+' %</strong></td>';}).join("")));
+  stack("stackRef",[60,40,0,0]); stack("stackNow",fin);
+  var cf=G.allocation.confirme;
+  $("confNote").textContent= cf ? (G.regime_confirme===G.regime ? "Avec la règle de confirmation sur deux mois (piste de la note de cadrage), le régime retenu est identique : même orientation." : "Avec la règle de confirmation sur deux mois (piste de la note de cadrage), le régime retenu serait « "+G.regime_confirme+" » : "+arr(cf.finale).map(function(v,i){return LAB[i].toLowerCase()+" "+v+" %";}).join(", ")+".") : "";
+  var tr=$("rank"); tr.innerHTML="";
+  (D.preference_geographique||[]).forEach(function(p){var rg=REG[p.regime]||{col:"--muted"};
+    tr.appendChild(el("tr",null,"<td class='num'>"+p.rang+"</td><td style='white-space:nowrap'><span style='display:inline-block;width:10px;height:10px;border-radius:2px;background:var("+ZC[p.zone]+");margin-right:8px'></span>"+esc(p.nom)+"</td><td><span class='regime-chip' style='padding:2px 7px;font-size:12px'><i style='background:var("+rg.col+")'></i>"+esc(p.regime)+"</span></td><td class='n'>"+fx(p.score,0)+"</td><td class='n "+dcls(p.variation_3m)+"'>"+sg(p.variation_3m,1)+"</td><td>"+esc(p.position)+"</td>"));});
+  var b=D.parametres.bonus_regime||{};
+  $("rankNote").textContent="Classement par points : score de climat de la zone + variation sur 3 mois + bonus de régime ("+RK.map(function(r){return r.toLowerCase()+" "+sg(b[r]||0,0);}).join(", ")+"). Chaque zone est notée par rapport à sa propre histoire : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres dans l'absolu ».";
+}
+
+/* ================= Test historique ================= */
+var testCharts=[];
+function th(m,r){var b=D.monde[m]; return b&&b.test_historique? b.test_historique[r] : null;}
+function renderTest(){
+  testCharts.forEach(function(c){c.destroy();}); testCharts=[];
+  var T=th(mode,regMode), box=$("testCards"), tb=$("testTable"); box.innerHTML=""; tb.innerHTML="";
+  if(!T){box.innerHTML='<p class="small muted">Test historique absent du fichier de données.</p>'; return;}
+  var yrs=Object.keys(T).sort(), win=0, winDD=0, n=0;
+  yrs.forEach(function(y){var e=T[y];
+    var card=el("div",{class:"card"});
+    if(!e.disponible){card.innerHTML='<h3>'+y+' · '+(EPIS[y]||"")+'</h3><p class="small muted">Épisode non testé : '+esc(e.motif||"données insuffisantes")+'.</p>'; box.appendChild(card); return;}
+    n++; var d=e.perf_barometre-e.perf_60_40, dd=e.perte_max_barometre-e.perte_max_60_40; if(d>0) win++; if(dd>0) winDD++;
+    var seq=[], last=null; e.mois.forEach(function(m){if(m.regime!==last){seq.push({r:m.regime,n:1}); last=m.regime;} else seq[seq.length-1].n++;});
+    var avgA=e.mois.reduce(function(s,m){return s+m.A;},0)/e.mois.length;
+    card.innerHTML='<div class="kicker">'+mlab(e.mois[0].mois)+' à '+mlab(e.mois[e.mois.length-1].mois)+'</div><h3 style="font-size:16px;margin-top:4px">'+y+' · '+(EPIS[y]||"")+'</h3>'
+      +'<div class="chartbox" style="height:190px;margin-top:10px"><canvas role="img" aria-label="Valeur (base 100 au départ) du portefeuille baromètre et du 60/40 en '+y+'"></canvas></div>'
+      +'<div class="kv" style="margin-top:12px"><span class="muted">Sur la période</span><span class="muted">baromètre · 60/40</span>'
+      +'<span>Performance</span><span>'+sg(e.perf_barometre,1)+' % · '+sg(e.perf_60_40,1)+' %</span>'
+      +'<span>Perte maximale</span><span>'+fx(e.perte_max_barometre,1)+' % · '+fx(e.perte_max_60_40,1)+' %</span>'
+      +'<span>Part actions moyenne</span><span>'+fx(avgA,0)+' % · 60 %</span></div>'
+      +'<div class="stack" style="height:12px;margin-top:12px" aria-hidden="true">'+seq.map(function(s){return '<div style="width:'+(s.n/e.mois.length*100)+'%;background:var('+REG[s.r].col+')"></div>';}).join("")+'</div>'
+      +'<p class="small muted" style="margin:4px 0 0">Régimes appliqués : '+seq.map(function(s){return s.r.toLowerCase()+" ("+s.n+" mois)";}).join(", ")+'.</p>';
+    box.appendChild(card);
+    tb.appendChild(el("tr",null,'<td>'+y+' · '+(EPIS[y]||"")+'</td><td class="n">'+sg(e.perf_barometre,1)+' %</td><td class="n">'+sg(e.perf_60_40,1)+' %</td><td class="n '+dcls(d)+'">'+sg(d,1)+' pt</td><td class="n">'+fx(e.perte_max_barometre,1)+' %</td><td class="n">'+fx(e.perte_max_60_40,1)+' %</td>'));
+    if(window.Chart){var tc=css("--muted"), gc=css("--line");
+      testCharts.push(new Chart(card.querySelector("canvas"),{type:"line",
+        data:{labels:[addM(e.mois[0].mois,-1)].concat(e.mois.map(function(m){return m.mois;})), datasets:[
+          {label:"Baromètre", data:[100].concat(e.mois.map(function(m){return m.barometre;})), borderColor:css("--accent"), backgroundColor:css("--accent"), borderWidth:2.2, pointRadius:0, pointHoverRadius:4, tension:.15},
+          {label:"60 / 40", data:[100].concat(e.mois.map(function(m){return m.ref_60_40;})), borderColor:css("--muted"), backgroundColor:css("--muted"), borderWidth:1.6, borderDash:[5,4], pointRadius:0, pointHoverRadius:4, tension:.15}]},
+        options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"index",intersect:false},
+          scales:{x:{grid:{display:false},ticks:{color:tc,maxRotation:0,autoSkip:true,maxTicksLimit:6,callback:function(v,i){return MOIS[+this.getLabelForValue(v).slice(5)-1];}}},
+                  y:{ticks:{color:tc},grid:{color:alpha(gc,.7)}}},
+          plugins:{legend:{display:true,position:"bottom",labels:{color:tc,boxWidth:14,boxHeight:2}},
+            tooltip:{callbacks:{title:function(it){var i=it[0].dataIndex; if(!i) return "Départ : fin "+mlong(addM(e.mois[0].mois,-1))+" (base 100)"; var m=e.mois[i-1]; return "Fin "+mlong(m.mois)+" · "+m.regime+" · actions "+m.A+" %";}, label:function(c){return c.dataset.label+" : "+fx(c.raw,1);}}}}}}));}
+  });
+  $("testSummary").innerHTML= n ? "Sur ces "+n+" épisodes, avec la pondération "+(mode==="capi"?"par capitalisation":"égale")+" et un régime "+(regMode==="brut"?"appliqué dès le premier mois":"confirmé sur deux mois")+", la règle fait mieux que le 60 / 40 en performance <strong>"+win+" fois sur "+n+"</strong> et limite davantage la perte maximale <strong>"+winDD+" fois sur "+n+"</strong>. Trois épisodes ne suffisent pas à établir une supériorité : le résultat change d'ailleurs selon la variante retenue (tableau ci-dessous)." : "Aucun épisode n'a pu être testé.";
+  var sv=$("testSens"); sv.innerHTML="";
+  [["capi","brut","Capitalisation, régime immédiat"],["capi","confirme","Capitalisation, régime confirmé"],["egal","brut","Parts égales, régime immédiat"],["egal","confirme","Parts égales, régime confirmé"]].forEach(function(v){var t=th(v[0],v[1]); if(!t) return;
+    var cur=v[0]===mode&&v[1]===regMode;
+    sv.appendChild(el("tr",cur?{style:"background:var(--band)"}:null,'<td>'+v[2]+(cur?' <span class="small muted">(affichée)</span>':'')+'</td>'+yrs.map(function(y){var e=t[y]; if(!e||!e.disponible) return '<td class="n">n.d.</td>'; var d=e.perf_barometre-e.perf_60_40; return '<td class="n '+dcls(d)+'">'+sg(d,1)+' pt</td>';}).join("")));});
+  $("testSensHead").innerHTML='<th>Variante</th>'+yrs.map(function(y){return '<th class="n">'+y+'</th>';}).join("");
 }
 
 /* ================= Sources ================= */
 function renderSources(){
-  var pz=D.poids.zones;
-  $("capNote").textContent="Score mondial : moyenne des zones pondérée par la capitalisation boursière (États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ea*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %, estimation à partir des fiches MSCI"+(D.poids.maj_capi?" de "+mlong(D.poids.maj_capi):"")+") ou à parts égales.";
-  var ss=D.series||[], nok=ss.filter(function(s){return s.statut==="ok";}).length;
-  $("srcNote").textContent=ss.length+" séries, "+nok+" à jour. Date de la dernière observation publiée par chaque source, relevée lors de la collecte du "+new Date(D.genere_le).toLocaleDateString("fr-FR")+".";
-  var order=["socle","us","ea","jp","valorisation"], tb=$("srcTable"); tb.innerHTML="";
-  order.forEach(function(g){ss.filter(function(s){return s.groupe===g;}).forEach(function(s){
-    tb.appendChild(el("tr",null,'<td style="white-space:nowrap">'+esc(GROUPES[g])+'</td><td>'+esc(s.libelle)+'</td><td>'+esc(s.source)+(s.code?' <code>'+esc(s.code)+'</code>':'')+'</td><td>'+esc(FREQ[s.frequence]||s.frequence||"")+'</td><td class="num" style="white-space:nowrap">'+dateSerie(s)+'</td><td><span class="status '+esc(s.statut||"ok")+'">'+(STATUT[s.statut]||esc(s.statut))+'</span>'+(s.message?'<div class="small muted" style="margin-top:3px">'+esc(s.message)+'</div>':'')+'</td>'));});});
+  var pz=D.parametres.ponderations.capi;
+  $("capNote").textContent="Score mondial : moyenne des zones pondérée par la capitalisation boursière (États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ez*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %, estimation à partir des fiches MSCI) ou à parts égales.";
+  var ss=D.sources||[], nok=ss.filter(function(s){return statSrc(s).c==="ok";}).length;
+  $("srcNote").textContent=ss.length+" séries, "+nok+" sans signalement. Mois de la dernière observation de chaque source, relevé lors de la collecte du "+new Date(D.genere_le).toLocaleDateString("fr-FR")+" (PIB : trimestre).";
+  var tb=$("srcTable"); tb.innerHTML="";
+  var groupes=GROUPES_ORDRE.concat(ss.map(function(s){return s.groupe;}).filter(function(g,i,a){return GROUPES_ORDRE.indexOf(g)<0&&a.indexOf(g)===i;}));
+  groupes.forEach(function(g){ss.filter(function(s){return s.groupe===g;}).forEach(function(s){var st=statSrc(s);
+    var dv=s.derniere_valeur, dvt= dv===null||dv===undefined? "n.d." : fx(dv, Math.abs(dv)>=1000?0:Math.abs(dv)>=100?1:2);
+    tb.appendChild(el("tr",null,'<td style="white-space:nowrap">'+esc(g==="Socle"?"Socle de risque":g)+'</td><td>'+esc(s.serie)+'</td><td>'+esc(s.source)+'</td><td class="n">'+dvt+'</td><td class="num" style="white-space:nowrap">'+dateSrc(s)+'</td><td><span class="status '+st.c+'">'+st.t+'</span>'+(st.c==="secours"?'<div class="small muted" style="margin-top:3px">'+esc(s.statut)+(s.erreur?' : '+esc(s.erreur):'')+'</div>':'')+'</td>'));});});
 }
 
-var rt; window.addEventListener("resize",function(){clearTimeout(rt); rt=setTimeout(function(){if(D){renderHist();}},200);});
+var rt; window.addEventListener("resize",function(){clearTimeout(rt); rt=setTimeout(function(){if(D&&M){renderHist();}},200);});
 })();
 </script>
 </body>

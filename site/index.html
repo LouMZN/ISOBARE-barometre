@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baromètre synthétique mondial</title>
+<meta name="description" content="Baromètre du climat économique et financier (États-Unis, zone euro, Japon) : score, régime, valorisation et lecture d'allocation. Projet pédagogique KEDGE BS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --ink:#14213d; --muted:#5b6478; --line:#dde2ea; --accent:#a8741a;
+  --us:#2f5fb3; --ea:#b8860b; --jp:#b5476b; --glob:#14213d;
+  --good:#2e7d4f; --warn:#b07214; --bad:#b83a3a; --goodbg:#e4f2ea; --warnbg:#fbf0dc; --badbg:#f8e3e3;
+  --r1:#2e7d4f; --r2:#c7841a; --r3:#4f78b0; --r4:#b83a3a; --real:#2f8f86;
+  --band:rgba(20,33,61,.06);
+  --display:"IBM Plex Serif", Georgia, serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1522; --surface:#161e2e; --ink:#e6eaf2; --muted:#9aa4b8; --line:#2a3447; --accent:#d9a443;
+    --us:#6f9be6; --ea:#e0b04a; --jp:#e07b9c; --glob:#e6eaf2;
+    --good:#5cbf86; --warn:#e6a94a; --bad:#e57373; --goodbg:#17352a; --warnbg:#3a2d16; --badbg:#3b1d1f;
+    --r1:#5cbf86; --r2:#e6a94a; --r3:#7ea3d6; --r4:#e57373; --real:#4fb3a9;
+    --band:rgba(230,234,242,.06); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1522; --surface:#161e2e; --ink:#e6eaf2; --muted:#9aa4b8; --line:#2a3447; --accent:#d9a443;
+  --us:#6f9be6; --ea:#e0b04a; --jp:#e07b9c; --glob:#e6eaf2;
+  --good:#5cbf86; --warn:#e6a94a; --bad:#e57373; --goodbg:#17352a; --warnbg:#3a2d16; --badbg:#3b1d1f;
+  --r1:#5cbf86; --r2:#e6a94a; --r3:#7ea3d6; --r4:#e57373; --real:#4fb3a9;
+  --band:rgba(230,234,242,.06); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{scroll-behavior:smooth; scroll-padding-top:12px}
+body{background:var(--bg); color:var(--ink); font:15px/1.55 var(--body); overflow-x:hidden}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.wrap{max-width:1180px; margin:0 auto; padding:0 20px}
+@media (max-width:520px){.wrap{padding:0 16px}}
+header.top{background:var(--surface); border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex; flex-wrap:wrap; gap:12px 24px; align-items:flex-end; justify-content:space-between; padding-top:22px; padding-bottom:14px}
+.kicker{font:500 12px/1.3 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+h1{font:600 30px/1.15 var(--display); margin:6px 0 0; text-wrap:balance}
+h2{font:600 21px/1.25 var(--display); margin:0 0 4px; text-wrap:balance}
+h3{font:600 15px/1.3 var(--body); margin:0}
+@media (max-width:520px){h1{font-size:25px} h2{font-size:19px}}
+.sub{color:var(--muted); margin:0 0 16px; max-width:75ch}
+nav.tabs{display:flex; flex-wrap:wrap; gap:2px}
+nav.tabs a{font:500 13px var(--body); color:var(--muted); text-decoration:none; padding:6px 9px; border-radius:6px}
+nav.tabs a:hover{background:var(--band); color:var(--ink)}
+.notice{background:var(--warnbg); color:var(--ink); border-left:4px solid var(--warn); padding:10px 14px; border-radius:4px; font-size:13.5px; margin:18px 0 0}
+.notice.bad{background:var(--badbg); border-left-color:var(--bad)}
+.notice ul{margin:4px 0 0; padding-left:18px}
+section{padding:30px 0 6px}
+.grid{display:grid; gap:16px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px; min-width:0}
+@media (max-width:520px){.card{padding:14px}}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.hero{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.bignum{font:500 54px/1 var(--mono); letter-spacing:-.02em}
+.bignum small{font-size:20px; color:var(--muted)}
+.pill{display:inline-block; font:600 12px/1 var(--body); padding:5px 9px; border-radius:999px; letter-spacing:.02em}
+.pill.good{background:var(--goodbg); color:var(--good)} .pill.warn{background:var(--warnbg); color:var(--warn)} .pill.bad{background:var(--badbg); color:var(--bad)}
+.delta.up{color:var(--good)} .delta.down{color:var(--bad)}
+.row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.zonebar{display:grid; grid-template-columns:130px 1fr 40px; gap:10px; align-items:center; margin:8px 0}
+.track{height:10px; background:var(--band); border-radius:5px; position:relative; overflow:hidden}
+.fill{position:absolute; left:0; top:0; bottom:0; border-radius:5px}
+.track .mid{position:absolute; left:50%; top:-2px; bottom:-2px; width:1px; background:var(--muted); opacity:.5}
+.chartbox{position:relative; width:100%}
+.legend{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; align-items:center}
+.legend button{font:500 13px var(--body); color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:5px 11px; cursor:pointer; display:flex; gap:7px; align-items:center}
+.legend button[aria-pressed="false"]{opacity:.45}
+.legend i{width:14px; height:3px; border-radius:2px; display:inline-block}
+.zones{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.zones{grid-template-columns:1fr}}
+.zonecard{border-top:4px solid var(--c)}
+.zonehead{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px}
+.zscore{font:500 34px/1 var(--mono)}
+.comp{display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:center; padding:7px 0; border-top:1px solid var(--line)}
+.comp .lab{font-size:13.5px}
+.comp .raw{font:12px var(--mono); color:var(--muted)}
+.comp .dt{display:block; font-size:11.5px; color:var(--muted)}
+.comp .sc{font:500 14px var(--mono); text-align:right}
+.comp .track{grid-column:1 / -1; height:6px}
+.risk{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.risk{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.risk{grid-template-columns:1fr}}
+.rv{font:500 26px/1.1 var(--mono); margin:6px 0 2px}
+.stripe{border-left:4px solid var(--s); padding-left:14px}
+.alloc{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+@media (max-width:900px){.alloc{grid-template-columns:1fr}}
+.stack{display:flex; height:34px; border-radius:6px; overflow:hidden; margin:8px 0 4px}
+.stack div{display:flex; align-items:center; justify-content:center; color:#fff; font:600 12px var(--mono); white-space:nowrap; overflow:hidden}
+table{width:100%; border-collapse:collapse; font-size:13.5px}
+th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font:600 12px var(--body); color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
+td.n,th.n{font-family:var(--mono); text-align:right; white-space:nowrap}
+th.n{font-family:var(--body)}
+.compact th,.compact td{padding:8px 6px}
+.tablewrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.status{display:inline-block; font:600 11.5px var(--body); padding:3px 7px; border-radius:4px; white-space:nowrap}
+.status.ok{background:var(--goodbg); color:var(--good)} .status.retard{background:var(--warnbg); color:var(--warn)} .status.secours{background:var(--badbg); color:var(--bad)}
+.method{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.method{grid-template-columns:1fr}}
+code{font:12.5px var(--mono); background:var(--band); padding:1px 5px; border-radius:4px; word-break:break-all}
+footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); color:var(--muted); font-size:13px}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface); max-width:100%}
+.seg button{font:500 13px var(--body); color:var(--muted); background:transparent; border:0; padding:6px 12px; cursor:pointer; white-space:nowrap}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--surface)}
+@media (max-width:520px){.seg button{padding:6px 9px; font-size:12.5px}}
+.toolbar{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; margin:0 0 14px}
+.toolbar .lbl{font-size:13px; color:var(--muted)}
+.regime-chip{display:inline-flex; align-items:center; gap:8px; font:600 13px var(--body); padding:6px 11px; border-radius:999px; border:1px solid var(--line); white-space:nowrap}
+.regime-chip i{width:10px; height:10px; border-radius:50%; flex:none}
+.two{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.three{grid-template-columns:1fr}}
+.kv{display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:13.5px}
+.kv > span:nth-child(even){font-family:var(--mono); text-align:right}
+.contrib{display:grid; grid-template-columns:190px 1fr 58px; gap:8px; align-items:center; margin:7px 0; font-size:13.5px}
+@media (max-width:520px){.contrib{grid-template-columns:118px 1fr 48px; font-size:12.5px}}
+.cbar{position:relative; height:14px}
+.cbar .axis{position:absolute; left:50%; top:-3px; bottom:-3px; width:1px; background:var(--muted)}
+.cbar .b{position:absolute; top:0; bottom:0; border-radius:3px}
+.cval{font:500 13px var(--mono); text-align:right}
+.lead{font-size:15px; max-width:75ch}
+.phrase{border-left:3px solid var(--accent); padding:2px 0 2px 10px; margin:12px 0 0; font-size:13.5px}
+.legend-q{display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12.5px; color:var(--muted); margin-top:8px}
+.limits{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.limits{grid-template-columns:1fr}}
+.limits h3{margin-bottom:4px}
+.limits p{margin:0; font-size:13.5px}
+#loading{padding:60px 0; text-align:center; color:var(--muted)}
+.check{font-size:12.5px; margin:8px 0 0}
+.check.ok{color:var(--good)} .check.ko{color:var(--bad)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="kicker">KEDGE BS · Gestion d'actifs et de portefeuille · Projet de groupe</div>
+      <h1>Baromètre synthétique mondial</h1>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#synthese">Synthèse</a><a href="#regime">Régime</a><a href="#valorisation">Valorisation</a><a href="#dynamique">Dynamique</a><a href="#historique">Historique</a><a href="#zones">Zones</a><a href="#risque">Risque</a><a href="#allocation">Allocation</a><a href="#methode">Méthode</a><a href="#limites">Limites</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="alerts"></div>
+  <div id="loading">Chargement des données…</div>
+
+  <div id="app" hidden>
+  <!-- SYNTHÈSE -->
+  <section id="synthese">
+    <div class="toolbar" style="justify-content:space-between">
+      <div><h2>Synthèse</h2><p class="sub" id="asof" style="margin:0"></p></div>
+      <div class="row"><span class="lbl" id="wlbl">Pondération du score mondial</span>
+        <div class="seg" role="group" aria-labelledby="wlbl"><button type="button" id="wcap" aria-pressed="true">Capitalisation</button><button type="button" id="weq" aria-pressed="false">Égale</button></div></div>
+    </div>
+    <div class="grid hero">
+      <div class="card">
+        <div class="kicker">1 · Climat : score mondial</div>
+        <div class="row" style="justify-content:space-between; align-items:flex-end; margin-top:8px">
+          <div class="bignum num" id="gScore"></div>
+          <div id="gauge" style="width:140px"></div>
+        </div>
+        <div class="row" style="margin-top:10px"><span id="gPill"></span></div>
+        <div class="kv" style="margin-top:12px"><span>Variation sur 1 mois</span><span id="d1"></span><span>Variation sur 3 mois</span><span id="d3"></span><span>Variation sur 12 mois</span><span id="d12"></span></div>
+        <p class="phrase" id="gPhrase"></p>
+        <p class="small muted" style="margin:10px 0 0" id="wNote"></p>
+      </div>
+      <div class="card">
+        <div class="kicker">2 · Régime et valorisation</div>
+        <div style="margin-top:12px" id="regChip"></div>
+        <p class="small" id="regText" style="margin:8px 0 12px"></p>
+        <div class="zonebar"><span class="small">Attrait actions</span><div class="track"><div class="fill" id="eqFill"></div><div class="mid"></div></div><span class="num small" id="eqVal" style="text-align:right"></span></div>
+        <div class="zonebar"><span class="small">Attrait obligations</span><div class="track"><div class="fill" id="bdFill"></div><div class="mid"></div></div><span class="num small" id="bdVal" style="text-align:right"></span></div>
+        <p class="small muted" style="margin:6px 0 0">Au-dessus de 50 : plus attractif que la moyenne historique.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">3 · Lecture d'allocation</div>
+        <h3 id="aTitle" style="margin-top:10px; font-size:16px"></h3>
+        <div class="stack" id="aStackMini" aria-hidden="true"></div>
+        <p class="small" id="aText" style="margin:8px 0 0"></p>
+        <p class="small muted" style="margin:8px 0 0"><span style="color:var(--us)">■</span> Actions <span style="color:var(--ea)">■</span> Obligations <span style="color:var(--real)">■</span> Actifs réels <span style="color:var(--muted)">■</span> Liquidités. Détail dans la section Allocation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RÉGIME -->
+  <section id="regime">
+    <h2>Régime économique : croissance et inflation</h2>
+    <p class="sub">La même note globale peut cacher des situations opposées. Ce qui oriente l'allocation, c'est la combinaison croissance / inflation, logique du portefeuille All Weather. Les traînées montrent le chemin parcouru sur les 6 derniers mois.</p>
+    <div class="grid two">
+      <div class="card"><div class="chartbox" id="quadBox" style="height:380px"><canvas id="quad" role="img" aria-label="Position des zones et du monde dans les quatre régimes croissance et inflation, avec la trajectoire des six derniers mois"></canvas></div>
+        <div class="legend-q" id="quadLegend"></div></div>
+      <div class="card">
+        <h3>Lecture des quatre régimes</h3>
+        <div class="tablewrap" style="margin-top:8px"><table>
+          <thead><tr><th>Régime</th><th>Définition</th><th>Actifs favorisés</th></tr></thead>
+          <tbody id="regTable"></tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0">Croissance : moyenne des sous-scores PIB et indicateur avancé (seuil 50). Inflation : glissement annuel (seuil 2,5 %, soit la cible de 2 % plus une marge de tolérance). Le régime mondial suit la pondération choisie en synthèse.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALORISATION -->
+  <section id="valorisation">
+    <h2>Valorisation : le climat est-il déjà dans les prix ?</h2>
+    <p class="sub">Un climat favorable coïncide souvent avec des marchés chers. Ce pilier n'entre pas dans le score de climat : il corrige l'allocation. Plus le PER de Shiller est élevé, moins la performance future tend à être bonne.</p>
+    <div class="grid three" id="valCards"></div>
+  </section>
+
+  <!-- DYNAMIQUE -->
+  <section id="dynamique">
+    <h2>Dynamique : ce qui fait bouger le score</h2>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Horizon" id="hzSeg"></div>
+      <div class="seg" role="group" aria-label="Périmètre" id="scSeg"></div>
+    </div>
+    <div class="grid two">
+      <div class="card"><p class="lead" id="dynText" style="margin:0 0 12px"></p><div id="contribs"></div>
+        <p class="small muted" style="margin:10px 0 0" id="dynNote"></p><p class="check" id="dynCheck"></p></div>
+      <div class="card">
+        <h3>Variations par zone</h3>
+        <div class="tablewrap" style="margin-top:8px"><table>
+          <thead><tr><th>Zone</th><th class="n">Score</th><th class="n">1 mois</th><th class="n">3 mois</th><th class="n">12 mois</th></tr></thead>
+          <tbody id="varTable"></tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0">Un même niveau n'appelle pas la même décision selon qu'il monte ou qu'il baisse : la tendance se lit à côté du niveau.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORIQUE -->
+  <section id="historique">
+    <h2>Évolution du score depuis 2016</h2>
+    <p class="sub">Scores mensuels ; bandes grisées : épisodes de crise ; pointillés : seuils 40 et 60. Le ruban sous le graphique indique le régime mondial de chaque mois.</p>
+    <div class="card">
+      <div class="legend" id="legend" role="group" aria-label="Séries affichées"></div>
+      <div class="chartbox" id="histBox" style="height:380px"><canvas id="hist" role="img" aria-label="Évolution mensuelle des scores de climat depuis janvier 2016 et ruban du régime mondial"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ZONES -->
+  <section id="zones">
+    <h2>Détail par zone</h2>
+    <p class="sub">Sous-scores de 0 à 100 ; le trait central marque la moyenne des 10 dernières années (50). Valeur brute du mois de référence entre parenthèses, puis date de la dernière donnée publiée par la source.</p>
+    <div class="grid zones" id="zoneCards"></div>
+  </section>
+
+  <!-- RISQUE -->
+  <section id="risque">
+    <h2>Socle mondial de risque</h2>
+    <p class="sub">Quatre indicateurs communs aux trois zones (5 % chacun, 20 % de chaque score de zone), notés de façon inversée : plus la tension est forte, plus le sous-score est bas.</p>
+    <div class="grid risk" id="riskCards"></div>
+  </section>
+
+  <!-- ALLOCATION -->
+  <section id="allocation">
+    <h2>Lecture d'allocation en trois étapes</h2>
+    <p class="sub">Le régime fixe la base, le climat règle le niveau de risque, la valorisation corrige les excès de prix. Seuils et répartitions fixés a priori, non optimisés sur le passé.</p>
+    <div class="grid alloc">
+      <div class="card">
+        <div class="tablewrap"><table>
+          <thead><tr><th>Étape</th><th class="n">Actions</th><th class="n">Oblig. d'État</th><th class="n">Actifs réels</th><th class="n">Liquidités</th></tr></thead>
+          <tbody id="steps"></tbody></table></div>
+        <div class="small" style="margin-top:14px">Référence du cours (60 / 40)</div><div class="stack" id="stackRef"></div>
+        <div class="small" style="margin-top:8px">Orientation actuelle</div><div class="stack" id="stackNow"></div>
+        <p class="small muted" style="margin:8px 0 0">Actifs réels : or, matières premières, obligations indexées sur l'inflation.</p>
+      </div>
+      <div class="card">
+        <h3>Préférence géographique</h3>
+        <div class="tablewrap" style="margin-top:8px"><table class="compact"><thead><tr><th>Rang</th><th>Zone</th><th>Régime</th><th class="n">Score</th><th class="n">3 mois</th><th>Orientation</th></tr></thead><tbody id="rank"></tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0">Classement par score de climat de zone, indépendant de la pondération du score mondial. Chaque zone est notée par rapport à sa propre histoire : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres dans l'absolu ».</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÉTHODE -->
+  <section id="methode">
+    <h2>Méthode et sources</h2>
+    <div class="grid method">
+      <div class="card">
+        <h3>Score de climat (par zone)</h3>
+        <div class="tablewrap" style="margin-top:8px"><table>
+          <thead><tr><th>Famille</th><th>Indicateur</th><th class="n">Poids</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2">Croissance</td><td>Croissance du PIB réel (glissement annuel)</td><td class="n">15 %</td></tr>
+            <tr><td>Indicateur avancé de l'OCDE (CLI)</td><td class="n">15 %</td></tr>
+            <tr><td>Inflation</td><td>Écart absolu à la cible de 2 %</td><td class="n">20 %</td></tr>
+            <tr><td rowspan="2">Marchés</td><td>Tendance actions (cours / moyenne 12 mois)</td><td class="n">15 %</td></tr>
+            <tr><td>Pente 10 ans moins 3 mois</td><td class="n">15 %</td></tr>
+            <tr><td>Risque mondial</td><td>VIX, spread Baa, géopolitique, Brent</td><td class="n">4 × 5 %</td></tr>
+          </tbody></table></div>
+        <p class="small muted" style="margin:10px 0 0" id="capNote"></p>
+      </div>
+      <div class="card">
+        <h3>Normalisation et règles</h3>
+        <ol class="small" style="padding-left:18px; margin:8px 0 0">
+          <li>Séries ramenées en mensuel (dernière valeur connue du mois).</li>
+          <li>Climat : Z-score sur 10 ans glissants, écrêté à ±3, converti en <code>s = (z + 3) / 6 × 100</code> ; inversion pour le risque ; écart absolu à 2 % pour l'inflation, inversé.</li>
+          <li>Valorisation : Z-score sur l'historique long disponible. Actions : 1 / PER de Shiller moins taux réel 10 ans américain. Obligations : taux réel 10 ans par zone.</li>
+          <li>Régime : croissance (moyenne des sous-scores PIB et CLI, seuil 50) × inflation (seuil 2,5 %). Bases A / O / R / L : expansion 65 / 25 / 5 / 5, surchauffe 50 / 10 / 30 / 10, ralentissement 35 / 50 / 5 / 10, stagflation 30 / 15 / 30 / 25.</li>
+          <li>Allocation : climat &lt; 40 : actions −10 vers liquidités ; ≥ 60 : actions +5. Attrait actions &lt; 35 : actions −10 vers obligations si leur attrait ≥ 50, sinon vers liquidités ; &gt; 65 : actions +5.</li>
+          <li>Contributions : poids de la zone × poids de l'indicateur × variation du sous-score ; leur somme égale la variation du score (contrôle affiché dans la section Dynamique).</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Sources et fraîcheur des séries</h3>
+      <p class="small muted" style="margin:4px 0 8px" id="srcNote"></p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Groupe</th><th>Série</th><th>Source</th><th>Fréquence</th><th>Dernière donnée</th><th>Statut</th></tr></thead>
+        <tbody id="srcTable"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- LIMITES -->
+  <section id="limites">
+    <h2>Limites</h2>
+    <p class="sub">Ce site est un exercice pédagogique. Il décrit un climat et des niveaux de prix ; il ne constitue pas une recommandation d'investissement.</p>
+    <div class="grid limits">
+      <div class="card"><h3>Chine exclue</h3><p>Aucune source gratuite et automatisable n'a été trouvée pour trois des quatre indicateurs de zone chinois. Le Japon la remplace ; la Chine reste présente via l'indice de risque géopolitique.</p></div>
+      <div class="card"><h3>Valorisation actions : États-Unis seulement</h3><p>Pas de PER de Shiller en accès libre pour la zone euro et le Japon. L'attrait des actions repose sur le marché américain, qui pèse environ 84 % de la capitalisation des trois zones.</p></div>
+      <div class="card"><h3>Seuils fixés a priori</h3><p>Les seuils (40, 60, 35, 65, 2,5 %) et les répartitions par régime sont posés a priori et non calibrés sur le passé : les optimiser rendrait tout test historique trompeur. Une zone proche d'un seuil peut changer de régime d'un mois à l'autre.</p></div>
+      <div class="card"><h3>Flux de capitaux absents</h3><p>Cités par le sujet, mais les séries de référence sont payantes. Leur absence est assumée.</p></div>
+      <div class="card"><h3>Corrélation n'est pas causalité</h3><p>Le baromètre ne prédit pas les rendements. Les corrélations entre classes d'actifs montent en période de crise : la diversification protège moins quand on en a le plus besoin.</p></div>
+      <div class="card"><h3>Retards et doubles comptes</h3><p>Les sources publient avec retard (PIB trimestriel notamment) : la date de la dernière donnée de chaque série est affichée. VIX et spread, PIB et CLI sont corrélés ; la pondération par famille limite cet effet.</p></div>
+    </div>
+  </section>
+
+  <footer id="foot">
+    Projet pédagogique KEDGE BS, cours « Gestion d'actifs et de portefeuille ». Données publiques collectées automatiquement chaque jour (FRED, OCDE, BCE, Eurostat, Shiller, Caldara et Iacoviello). Ne constitue pas un conseil en investissement.
+  </footer>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= Référentiels ================= */
+var ZK = ["us","ea","jp"];
+var ZN = {us:"États-Unis", ea:"Zone euro", jp:"Japon"};
+var ZC = {us:"--us", ea:"--ea", jp:"--jp"};
+var COMP = [
+  {k:"gdp",   label:"Croissance du PIB",       art:"la croissance du PIB",         fmt:function(v){return fx(v,1)+" %";}},
+  {k:"cli",   label:"Indicateur avancé OCDE",  art:"l'indicateur avancé de l'OCDE", fmt:function(v){return fx(v,1);}},
+  {k:"infl",  label:"Inflation (écart à 2 %)", art:"l'inflation",                  fmt:function(v){return fx(v,1)+" % sur un an";}},
+  {k:"eq",    label:"Tendance actions",        art:"la tendance des actions",      fmt:function(v){return sg(v*100,1)+" %";}},
+  {k:"slope", label:"Pente 10 ans − 3 mois",   art:"la pente des taux",            fmt:function(v){return sg(v,2)+" pt";}}
+];
+var RISK = [
+  {k:"vix", label:"VIX",                 art:"le VIX",                 sub:"Volatilité implicite à 30 jours du S&P 500", fmt:function(v){return fx(v,1)+" pts";}},
+  {k:"baa", label:"Spread de crédit",    art:"le spread de crédit",    sub:"Moody's Baa contre taux 10 ans américain",   fmt:function(v){return fx(v,2)+" pt";}},
+  {k:"gpr", label:"Risque géopolitique", art:"le risque géopolitique", sub:"Indice Caldara et Iacoviello",               fmt:function(v){return fx(v,0);}},
+  {k:"oil", label:"Choc pétrolier",      art:"le prix du pétrole",     sub:"Brent, écart à sa moyenne 12 mois",          fmt:function(v){return sg(v*100,1)+" %";}}
+];
+var REG = {
+  expansion:      {name:"Expansion",      col:"--r1", def:"Croissance forte, inflation maîtrisée", assets:"Actions", mix:[65,25,5,5]},
+  surchauffe:     {name:"Surchauffe",     col:"--r2", def:"Croissance forte, inflation élevée",    assets:"Actions de valeur, matières premières, obligations indexées", mix:[50,10,30,10]},
+  ralentissement: {name:"Ralentissement", col:"--r3", def:"Croissance faible, inflation maîtrisée", assets:"Obligations d'État", mix:[35,50,5,10]},
+  stagflation:    {name:"Stagflation",    col:"--r4", def:"Croissance faible, inflation élevée",   assets:"Liquidités, or, obligations indexées courtes", mix:[30,15,30,25]}
+};
+var RK = ["expansion","surchauffe","ralentissement","stagflation"];
+var GROUPES = {socle:"Socle de risque", us:"États-Unis", ea:"Zone euro", jp:"Japon", valorisation:"Valorisation"};
+var FREQ = {quotidienne:"Quotidienne", mensuelle:"Mensuelle", trimestrielle:"Trimestrielle"};
+var STATUT = {ok:"À jour", retard:"En retard", secours:"Valeur conservée"};
+var CRISES = [{a:"2020-02",b:"2020-07",t:"Covid-19"},{a:"2022-02",b:"2022-10",t:"Ukraine, inflation"}];
+
+/* ================= Utilitaires ================= */
+function fx(v,d){if(v===null||v===undefined||isNaN(v)) return "n.d."; return Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});}
+function sg(v,d){if(v===null||v===undefined||isNaN(v)) return "n.d."; var r=Math.abs(v)<0.5*Math.pow(10,-d); return r? fx(0,d) : (v>0?"+":"−")+fx(Math.abs(v),d);}
+function pts(v){return Math.abs(v)<2?"point":"points";}
+function esc(s){return String(s===null||s===undefined?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function state(s){s=Math.round(s); return s>=60?{c:"good",t:"Favorable"}:s>=40?{c:"warn",t:"Neutre"}:{c:"bad",t:"Dégradé"};}
+function dcls(v){return v>=0?"delta up":"delta down";}
+function el(tag,attrs,html){var e=document.createElement(tag); if(attrs) for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!==undefined) e.innerHTML=html; return e;}
+function $(id){return document.getElementById(id);}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function alpha(col,a){var c=document.createElement("canvas").getContext("2d"); c.fillStyle=col; var h=c.fillStyle; if(h.charAt(0)==="#"){var n=parseInt(h.slice(1),16); return "rgba("+(n>>16&255)+","+(n>>8&255)+","+(n&255)+","+a+")";} return h.replace(/rgba?\(([^)]+)\)/,function(_,p){var q=p.split(","); return "rgba("+q[0]+","+q[1]+","+q[2]+","+a+")";});}
+var MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+var MOISL=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+function mlab(s){var p=String(s).split("-"); return MOIS[+p[1]-1]+" "+p[0];}
+function mlong(s){var p=String(s).split("-"); return MOISL[+p[1]-1]+" "+p[0];}
+function dateSerie(s){
+  if(!s||!s.derniere_date) return "n.d.";
+  var p=s.derniere_date.split("-");
+  if(s.frequence==="trimestrielle") return "T"+(Math.floor((+p[1]-1)/3)+1)+" "+p[0];
+  if(s.frequence==="mensuelle") return mlab(p[0]+"-"+p[1]);
+  return (p[2]||"01")+"/"+p[1]+"/"+p[0];
+}
+function seg(id,opts,cur,cb){var box=$(id); box.innerHTML=""; opts.forEach(function(o){var b=el("button",{type:"button","aria-pressed":String(o[0]===cur)},o[1]); b.addEventListener("click",function(){Array.prototype.forEach.call(box.children,function(c){c.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true"); cb(o[0]);}); box.appendChild(b);});}
+
+/* ================= Chargement ================= */
+var D, L, S0, mode="cap", G;
+fetch("data.json",{cache:"no-store"}).then(function(r){
+  if(!r.ok) throw new Error("data.json introuvable (HTTP "+r.status+")");
+  return r.json();
+}).then(function(d){D=d; init();}).catch(function(e){
+  $("loading").innerHTML='<div class="notice bad" style="text-align:left"><strong>Données indisponibles.</strong> '+esc(e.message)+'. Le fichier <code>data.json</code> est produit par le script de collecte quotidien ; vérifiez la dernière exécution dans l\'onglet Actions du dépôt GitHub.</div>';
+  if(window.console) console.error(e);
+});
+
+function init(){
+  var n=D.dates.length;
+  L=n-1; while(L>0 && (D.monde.cap.score[L]===null||D.monde.cap.score[L]===undefined)) L--;
+  S0=D.dates.indexOf("2016-01"); if(S0<0) S0=0;
+  renderAlerts();
+  $("loading").hidden=true; $("app").hidden=false;
+  if(window.Chart){
+    Chart.defaults.animation=false;
+    Chart.defaults.font.family='"IBM Plex Mono", ui-monospace, Menlo, monospace';
+    Chart.defaults.font.size=11;
+  }
+  $("wcap").addEventListener("click",function(){setMode("cap");});
+  $("weq").addEventListener("click",function(){setMode("egal");});
+  seg("hzSeg",[[1,"1 mois"],[3,"3 mois"],[12,"12 mois"],["lvl","Niveau"]],3,function(v){hz=v; renderDyn();});
+  seg("scSeg",[["w","Monde"],["us","États-Unis"],["ea","Zone euro"],["jp","Japon"]],"w",function(v){scope=v; renderDyn();});
+  renderStatic();
+  all();
+  var mq=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)");
+  if(mq&&mq.addEventListener) mq.addEventListener("change",function(){renderQuad(); renderHist();});
+}
+function setMode(m){mode=m; $("wcap").setAttribute("aria-pressed",String(m==="cap")); $("weq").setAttribute("aria-pressed",String(m==="egal")); all();}
+function wz(k){return mode==="cap"? D.poids.zones[k] : 1/3;}
+function all(){G=D.monde[mode]; renderSummary(); renderQuad(); renderDyn(); renderHist(); renderAlloc(); renderValBond();}
+function renderStatic(){renderVal(); renderZones(); renderRisk(); renderSources();}
+
+/* ================= Alertes ================= */
+function renderAlerts(){
+  var box=$("alerts"), h="";
+  if(D.simule) h+='<div class="notice bad"><strong>Données simulées.</strong> Ce jeu de données sert uniquement à tester l\'affichage ; aucune valeur ne reflète la réalité.</div>';
+  var pb=(D.series||[]).filter(function(s){return s.statut&&s.statut!=="ok";});
+  var msgs=(D.alertes||[]).map(esc);
+  pb.forEach(function(s){msgs.push('<strong>'+esc(GROUPES[s.groupe]||s.groupe)+' · '+esc(s.libelle)+'</strong> ('+STATUT[s.statut]+', dernière donnée : '+dateSerie(s)+')'+(s.message?' : '+esc(s.message):''));});
+  if(msgs.length) h+='<div class="notice"><strong>Points d\'attention sur les données</strong><ul>'+msgs.map(function(m){return "<li>"+m+"</li>";}).join("")+'</ul></div>';
+  box.innerHTML=h;
+}
+function serieOf(groupe,ind){return (D.series||[]).filter(function(s){return s.groupe===groupe&&s.indicateur===ind;})[0];}
+function badge(s){return s&&s.statut&&s.statut!=="ok"?' <span class="status '+s.statut+'">'+STATUT[s.statut]+'</span>':'';}
+
+/* ================= Contributions et phrase automatique ================= */
+var IND=COMP.map(function(c){return {k:c.k,label:c.label,art:c.art,zone:true};}).concat(RISK.map(function(r){return {k:r.k,label:r.label,art:r.art,zone:false};}));
+function contribs(h,sc){
+  var w={}; ZK.forEach(function(k){w[k]= sc==="w"? wz(k) : (sc===k?1:0);});
+  return IND.map(function(ind){var c=0;
+    if(ind.zone){var pw=D.poids.indicateurs[ind.k]; ZK.forEach(function(k){if(!w[k]) return; var s=D.zones[k].sous_scores[ind.k]; c+=w[k]*pw*(h==="lvl"? s[L]-50 : s[L]-s[L-h]);});}
+    else {var s=D.risque.sous_scores[ind.k]; c=D.poids.risque[ind.k]*(h==="lvl"? s[L]-50 : s[L]-s[L-h]);}
+    return {label:ind.label,art:ind.art,v:c};});
+}
+function scoreOf(sc){return sc==="w"? G.score : D.zones[sc].score;}
+function phrase(h,sc){
+  var cs=contribs(h,sc), s=scoreOf(sc), name= sc==="w"?"le score mondial":"le score "+(sc==="ea"?"de la zone euro":sc==="us"?"des États-Unis":"du Japon");
+  var sorted=cs.slice().sort(function(a,b){return Math.abs(b.v)-Math.abs(a.v);});
+  var up=sorted.filter(function(c){return c.v>=0.05;}), dn=sorted.filter(function(c){return c.v<=-0.05;});
+  function nm(c){return c.art+" ("+sg(c.v,1)+")";}
+  var A=up[0], B=dn[0], t;
+  if(h==="lvl"){var v=s[L], e=v-50;
+    t=cap1(name)+" est à <strong>"+fx(v,0)+"</strong>, soit "+fx(Math.abs(e),1)+" "+pts(e)+" "+(e>=0?"au-dessus":"au-dessous")+" de la neutralité (50)";
+    t+= A&&B ? ", soutenu par "+nm(A)+", pénalisé par "+nm(B)+"." : A ? ", soutenu par "+nm(A)+", sans facteur pénalisant notable." : B ? ", pénalisé par "+nm(B)+", sans soutien notable." : ".";
+  } else {var d=s[L]-s[L-h], hl=h===1?"un mois":h===3?"trois mois":"douze mois";
+    t="Sur "+hl+", "+name+" a varié de <strong>"+sg(d,1)+" "+pts(d)+"</strong>";
+    t+= A&&B ? ", porté par "+nm(A)+", freiné par "+nm(B)+"." : A ? ", porté par "+nm(A)+", sans frein notable." : B ? ", freiné par "+nm(B)+", sans soutien notable." : ", sans mouvement notable.";
+  }
+  return {text:t, cs:cs, sorted:sorted};
+}
+function cap1(t){return t.charAt(0).toUpperCase()+t.slice(1);}
+
+/* ================= Synthèse ================= */
+function renderSummary(){
+  $("asof").textContent="Mois de référence : "+mlong(D.dates[L])+" · collecte du "+new Date(D.genere_le).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+".";
+  var g=G.score[L], st=state(g);
+  $("gScore").innerHTML=fx(g,0)+"<small>/100</small>";
+  $("gPill").innerHTML='<span class="pill '+st.c+'">Climat '+st.t.toLowerCase()+'</span>';
+  [1,3,12].forEach(function(h){var d=g-G.score[L-h], e=$("d"+h); e.textContent=sg(d,1)+" pt"; e.className=dcls(d);});
+  $("gPhrase").innerHTML=phrase(3,"w").text;
+  var pz=D.poids.zones;
+  $("wNote").textContent= mode==="cap" ? "Pondération par capitalisation : États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ea*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %. Le score mondial reflète surtout les États-Unis." : "Pondération égale : chaque zone compte pour un tiers. Lecture plus économique que financière.";
+  drawGauge($("gauge"),g);
+  var r=REG[G.regime[L]];
+  $("regChip").innerHTML='<span class="regime-chip"><i style="background:var('+r.col+')"></i>Régime mondial : '+r.name+'</span>';
+  $("regText").innerHTML=r.def+" (croissance "+fx(G.croissance[L],0)+"/100, inflation "+fx(G.inflation[L],1)+" %). Actifs favorisés : <strong>"+r.assets.toLowerCase()+"</strong>.";
+  setBar("eq",D.valorisation.attrait_actions[L]); setBar("bd",G.attrait_oblig[L]);
+  var a=G.allocation.finale;
+  $("aTitle").textContent=allocTitle(a);
+  stack("aStackMini",a,true);
+  var rk=ranked();
+  $("aText").innerHTML="Zone à privilégier : <strong>"+ZN[rk[0]]+"</strong>. Zone la plus fragile : <strong>"+ZN[rk[2]]+"</strong>.";
+}
+function setBar(p,v){var f=$(p+"Fill"); f.style.width=Math.max(0,Math.min(100,v))+"%"; f.style.background="var(--"+state(v).c+")"; $(p+"Val").textContent=fx(v,0);}
+function drawGauge(box,v){
+  var w=140,h=80,cx=70,cy=72,r=58;
+  function pt(p,rr){var a=Math.PI*(1-p/100); return [cx+rr*Math.cos(a), cy-rr*Math.sin(a)];}
+  function arc(a,b,col){var p1=pt(a,r),p2=pt(b,r); return '<path d="M'+p1[0]+' '+p1[1]+' A'+r+' '+r+' 0 0 1 '+p2[0]+' '+p2[1]+'" stroke="'+col+'" stroke-width="10" fill="none"/>';}
+  var n=pt(Math.max(0,Math.min(100,v)),r-15);
+  box.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" width="100%" role="img" aria-label="Jauge du score mondial : '+fx(v,0)+' sur 100">'+arc(0,39.5,"var(--bad)")+arc(40.5,59.5,"var(--warn)")+arc(60.5,100,"var(--good)")+'<line x1="'+cx+'" y1="'+cy+'" x2="'+n[0]+'" y2="'+n[1]+'" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="5" fill="var(--ink)"/></svg>';
+}
+
+/* ================= Quadrant des régimes (Chart.js) ================= */
+var quadChart=null;
+function renderQuad(){
+  var ents=ZK.map(function(k){return {name:ZN[k], col:css(ZC[k]), g:D.zones[k].croissance, inf:D.zones[k].brut.infl, r:6};});
+  ents.push({name:"Monde", col:css("--glob"), g:G.croissance, inf:G.inflation, r:8});
+  var xs=[],ys=[];
+  var ds=ents.map(function(e){var pts=[]; for(var i=Math.max(0,L-6);i<=L;i++){if(e.g[i]===null||e.inf[i]===null) continue; pts.push({x:e.g[i],y:e.inf[i],i:i}); xs.push(e.g[i]); ys.push(e.inf[i]);}
+    return {label:e.name, data:pts, showLine:true, borderColor:alpha(e.col,.5), borderWidth:1.5, backgroundColor:pts.map(function(p,j){return j===pts.length-1?e.col:alpha(e.col,.5);}),
+      pointRadius:pts.map(function(p,j){return j===pts.length-1?e.r:2.5;}), pointHoverRadius:pts.map(function(p,j){return j===pts.length-1?e.r+2:5;}),
+      pointBorderColor:pts.map(function(p,j){return j===pts.length-1?css("--surface"):"transparent";}), pointBorderWidth:2, _col:e.col};});
+  var x0=Math.min(20,Math.floor(Math.min.apply(null,xs)/10)*10), x1=Math.max(80,Math.ceil(Math.max.apply(null,xs)/10)*10);
+  var y0=Math.min(-1,Math.floor(Math.min.apply(null,ys))), y1=Math.max(6,Math.ceil(Math.max.apply(null,ys)));
+  var bg={id:"quadBg", beforeDatasetsDraw:function(ch){var c=ch.ctx, X=ch.scales.x, Y=ch.scales.y, a=ch.chartArea;
+      var q=[[50,x1,y0,2.5,"expansion"],[50,x1,2.5,y1,"surchauffe"],[x0,50,y0,2.5,"ralentissement"],[x0,50,2.5,y1,"stagflation"]];
+      c.save();
+      q.forEach(function(r){var col=css(REG[r[4]].col), l=X.getPixelForValue(r[0]), rr=X.getPixelForValue(r[1]), t=Y.getPixelForValue(r[3]), b=Y.getPixelForValue(r[2]);
+        c.fillStyle=alpha(col,.08); c.fillRect(l,t,rr-l,b-t);
+        c.fillStyle=col; c.font='600 12px "IBM Plex Sans", system-ui, sans-serif'; c.textAlign=r[0]===50?"right":"left";
+        c.fillText(REG[r[4]].name, r[0]===50? rr-8 : l+8, r[2]===y0? b-8 : t+16);});
+      c.strokeStyle=css("--muted"); c.setLineDash([4,4]); c.lineWidth=1;
+      c.beginPath(); c.moveTo(X.getPixelForValue(50),a.top); c.lineTo(X.getPixelForValue(50),a.bottom); c.moveTo(a.left,Y.getPixelForValue(2.5)); c.lineTo(a.right,Y.getPixelForValue(2.5)); c.stroke();
+      c.restore();},
+    afterDatasetsDraw:function(ch){var c=ch.ctx; c.save(); c.font='600 12px "IBM Plex Sans", system-ui, sans-serif'; c.lineWidth=3; c.strokeStyle=css("--surface"); c.lineJoin="round";
+      var labs=[];
+      ch.data.datasets.forEach(function(d,j){var meta=ch.getDatasetMeta(j); if(meta.hidden||!meta.data.length) return; var p=meta.data[meta.data.length-1], w=c.measureText(d.label).width;
+        var right=p.x+11+w>ch.chartArea.right; labs.push({t:d.label,col:d._col,x:right?p.x-11-w:p.x+11,y:p.y+4,w:w});});
+      labs.sort(function(a,b){return a.y-b.y;});
+      for(var i=1;i<labs.length;i++){for(var j=0;j<i;j++){var a=labs[j],b=labs[i]; if(b.x<a.x+a.w+4&&a.x<b.x+b.w+4&&b.y-a.y<14) b.y=a.y+14;}}
+      c.textAlign="left"; labs.forEach(function(l){c.fillStyle=l.col; c.strokeText(l.t,l.x,l.y); c.fillText(l.t,l.x,l.y);});
+      c.restore();}};
+  if(quadChart) quadChart.destroy();
+  if(!window.Chart){$("quadBox").innerHTML='<p class="small muted">Graphique indisponible (bibliothèque Chart.js non chargée).</p>'; return;}
+  var tc=css("--muted"), gc=css("--line");
+  quadChart=new Chart($("quad"),{type:"scatter", data:{datasets:ds}, plugins:[bg],
+    options:{responsive:true, maintainAspectRatio:false, layout:{padding:{right:6}},
+      scales:{x:{min:x0,max:x1,title:{display:true,text:"Croissance (score de 0 à 100)",color:tc},ticks:{color:tc,stepSize:10},grid:{color:alpha(gc,.6)}},
+              y:{min:y0,max:y1,title:{display:true,text:"Inflation sur un an",color:tc},ticks:{color:tc,stepSize:1,callback:function(v){return fx(v,0)+" %";}},grid:{color:alpha(gc,.6)}}},
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:function(c){var p=c.raw; return c.dataset.label+", "+mlab(D.dates[p.i])+" : croissance "+fx(p.x,0)+", inflation "+fx(p.y,1)+" %";}}}}}});
+  $("quadLegend").innerHTML='<span>Point plein : '+mlab(D.dates[L])+'</span><span>Traînée : 6 mois précédents</span><span>Pointillés : seuils (croissance 50, inflation 2,5 %)</span>';
+  var tb=$("regTable"); tb.innerHTML="";
+  RK.forEach(function(code){var r=REG[code], who=ZK.filter(function(k){return D.zones[k].regime[L]===code;}).map(function(k){return ZN[k];});
+    if(G.regime[L]===code) who.unshift("Monde");
+    tb.appendChild(el("tr",G.regime[L]===code?{style:"background:var(--band)"}:null,'<td><span class="regime-chip" style="padding:3px 8px"><i style="background:var('+r.col+')"></i>'+r.name+'</span>'+(who.length?'<div class="small muted" style="margin-top:4px">'+who.join(", ")+'</div>':'')+'</td><td>'+r.def+'</td><td>'+r.assets+'</td>'));});
+}
+
+/* ================= Valorisation ================= */
+function lab(v,a,b,c){v=Math.round(v); return v>=65?a:v>=35?b:c;}
+function renderVal(){
+  var V=D.valorisation, e=V.attrait_actions[L], se=state(e), sc=serieOf("valorisation","cape"), st=serieOf("valorisation","tips");
+  var box=$("valCards"); box.innerHTML="";
+  box.appendChild(el("div",{class:"card stripe",style:"--s:var(--"+se.c+")"},'<h3>Attrait des actions</h3><div class="small muted">Prime de risque : rendement bénéficiaire du PER de Shiller moins taux réel 10 ans (États-Unis)</div><div class="rv">'+fx(e,0)+'<span class="small muted"> /100</span></div><span class="pill '+se.c+'">'+lab(e,"Actions bon marché","Valorisation normale","Actions chères")+'</span>'
+    +'<div class="kv" style="margin-top:12px"><span>PER de Shiller</span><span>'+fx(V.cape[L],1)+'</span><span>Rendement 1 / PER</span><span>'+fx(100/V.cape[L],2)+' %</span><span>Taux réel 10 ans US</span><span>'+fx(V.taux_reel_us[L],2)+' %</span><span>Prime de risque</span><span>'+fx(V.prime[L],2)+' pt</span></div>'
+    +'<div style="margin-top:10px">'+spark(V.prime,"--"+se.c)+'</div><div class="small muted">Prime de risque, 2016 à '+mlab(D.dates[L])+'</div>'
+    +'<div class="small muted" style="margin-top:6px">Dernières données : CAPE '+dateSerie(sc)+badge(sc)+' · TIPS '+dateSerie(st)+badge(st)+'</div>'));
+  box.appendChild(el("div",{class:"card stripe",id:"bondCard"}));
+  box.appendChild(el("div",{class:"card",id:"verdictCard"}));
+}
+function renderValBond(){
+  var e=D.valorisation.attrait_actions[L], b=G.attrait_oblig[L], sb=state(b);
+  var rows=ZK.map(function(k){return '<span>'+ZN[k]+'</span><span>'+fx(D.zones[k].taux_reel[L],2)+' % · '+fx(D.zones[k].attrait_oblig[L],0)+'</span>';}).join("");
+  var c=$("bondCard"); c.style.setProperty("--s","var(--"+sb.c+")");
+  c.innerHTML='<h3>Attrait des obligations</h3><div class="small muted">Taux réel à 10 ans : plus il est élevé, plus les obligations rémunèrent l\'investisseur au-delà de l\'inflation</div><div class="rv">'+fx(b,0)+'<span class="small muted"> /100 · '+(mode==="cap"?"pondération capi":"pondération égale")+'</span></div><span class="pill '+sb.c+'">'+lab(b,"Obligations attractives","Attrait moyen","Obligations peu rémunératrices")+'</span><div class="kv" style="margin-top:12px"><span class="muted">Zone</span><span class="muted">taux réel · score</span>'+rows+'</div><p class="small muted" style="margin:10px 0 0">États-Unis : obligations indexées (TIPS). Zone euro et Japon : taux nominal 10 ans moins inflation constatée.</p>';
+  var verdict, vt;
+  if(Math.round(e)<35&&Math.round(b)>=50){verdict="Actions chères, obligations rémunératrices : le couple rendement / risque penche vers les obligations."; vt="warn";}
+  else if(Math.round(e)<35){verdict="Actions chères et obligations peu rémunératrices : peu d'actifs bon marché, la prudence et les liquidités gagnent en intérêt."; vt="bad";}
+  else if(Math.round(e)>65){verdict="Actions bon marché : un climat même moyen justifie de renforcer les actions."; vt="good";}
+  else {verdict="Valorisations dans leur zone normale : l'allocation suit le régime et le climat."; vt="good";}
+  $("verdictCard").innerHTML='<h3>Ce que ça change</h3><p style="margin:10px 0"><span class="pill '+vt+'">Lecture</span></p><p style="margin:0">'+verdict+'</p><p class="small muted" style="margin:12px 0 0">Règle appliquée à l\'allocation : attrait actions inférieur à 35, actions −10 points ; supérieur à 65, actions +5 points. La contrepartie va aux obligations si leur attrait atteint 50, sinon aux liquidités.</p>';
+}
+function spark(a,col){var w=200,h=44,lo=Infinity,hi=-Infinity,i,pts=[]; for(i=S0;i<=L;i++){if(a[i]===null) continue; lo=Math.min(lo,a[i]);hi=Math.max(hi,a[i]); pts.push(i);}
+  if(!pts.length) return "";
+  function X(i){return (i-S0)/((L-S0)||1)*w;} function Y(v){return h-3-(v-lo)/(hi-lo||1)*(h-6);}
+  var d=pts.map(function(i,j){return (j?"L":"M")+X(i).toFixed(1)+" "+Y(a[i]).toFixed(1);}).join(""); var f=d+"L"+X(pts[pts.length-1]).toFixed(1)+" "+h+"L"+X(pts[0]).toFixed(1)+" "+h+"Z";
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><path d="'+f+'" fill="var('+col+')" fill-opacity=".10"/><path d="'+d+'" fill="none" stroke="var('+col+')" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';}
+
+/* ================= Dynamique ================= */
+var hz=3, scope="w";
+function renderDyn(){
+  var P=phrase(hz,scope), cs=P.cs, sorted=P.sorted, tot=cs.reduce(function(a,b){return a+b.v;},0);
+  var mx=Math.max.apply(null,cs.map(function(c){return Math.abs(c.v);}))||1;
+  var box=$("contribs"); box.innerHTML="";
+  sorted.forEach(function(c){var wpc=Math.abs(c.v)/mx*50, pos=c.v>=0;
+    box.appendChild(el("div",{class:"contrib"},'<span>'+c.label+'</span><div class="cbar"><div class="axis"></div><div class="b" style="'+(pos?'left:50%':'right:50%')+';width:'+wpc+'%;background:var(--'+(pos?'good':'bad')+')"></div></div><span class="cval">'+sg(c.v,1)+'</span>'));});
+  $("dynText").innerHTML=P.text;
+  $("dynNote").textContent= hz==="lvl" ? "Contribution = poids de la zone × poids de l'indicateur × (sous-score − 50), en points de score. La somme des barres égale l'écart du score à 50." : "Contribution = poids de la zone × poids de l'indicateur × variation du sous-score, en points de score. La somme des barres égale la variation du score.";
+  var s=scoreOf(scope), target= hz==="lvl"? s[L]-50 : s[L]-s[L-hz], gap=Math.abs(tot-target), ck=$("dynCheck");
+  ck.className="check "+(gap<=0.05?"ok":"ko");
+  ck.textContent= gap<=0.05 ? "Contrôle : somme des contributions "+sg(tot,2)+" = "+(hz==="lvl"?"écart à 50":"variation du score")+" "+sg(target,2)+"." : "Écart de contrôle : somme des contributions "+sg(tot,2)+" contre "+sg(target,2)+" ("+fx(gap,2)+" pt). Vérifier le calcul dans le script de collecte.";
+  var vt=$("varTable"); vt.innerHTML="";
+  var rows=[{n:"Monde",s:G.score,col:"--glob"}].concat(ZK.map(function(k){return {n:ZN[k],s:D.zones[k].score,col:ZC[k]};}));
+  rows.forEach(function(r){function c(h){var d=r.s[L]-r.s[L-h]; return '<td class="n '+dcls(d)+'">'+sg(d,1)+'</td>';}
+    vt.appendChild(el("tr",null,'<td style="white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var('+r.col+');margin-right:8px"></span>'+r.n+'</td><td class="n">'+fx(r.s[L],0)+'</td>'+c(1)+c(3)+c(12)));});
+}
+
+/* ================= Historique (Chart.js) ================= */
+var histChart=null;
+var SERIES=[{key:"w",name:"Monde",color:"--glob",width:2.6,on:true},{key:"us",name:"États-Unis",color:"--us",width:1.5,on:true},{key:"ea",name:"Zone euro",color:"--ea",width:1.5,on:true},{key:"jp",name:"Japon",color:"--jp",width:1.5,on:true}];
+function sdata(k){return k==="w"?G.score:D.zones[k].score;}
+function renderLegend(){var lg=$("legend"); lg.innerHTML="";
+  SERIES.forEach(function(s,j){var b=el("button",{type:"button","aria-pressed":String(s.on)},'<i style="background:var('+s.color+')"></i>'+s.name+(s.key==="w"?(mode==="cap"?" (capi)":" (égale)"):""));
+    b.addEventListener("click",function(){s.on=!s.on; b.setAttribute("aria-pressed",String(s.on)); if(histChart){histChart.setDatasetVisibility(j,s.on); histChart.update();}}); lg.appendChild(b);});
+  RK.forEach(function(c){lg.appendChild(el("span",{class:"small muted",style:"display:inline-flex;align-items:center;gap:6px;margin-left:4px"},'<i style="width:12px;height:8px;border-radius:2px;background:var('+REG[c].col+')"></i>'+REG[c].name));});}
+function renderHist(){
+  renderLegend();
+  if(!window.Chart){$("histBox").innerHTML='<p class="small muted">Graphique indisponible (bibliothèque Chart.js non chargée).</p>'; return;}
+  var labels=D.dates.slice(S0,L+1), narrow=$("histBox").clientWidth<560;
+  $("histBox").style.height=(narrow?320:380)+"px";
+  var ds=SERIES.map(function(s){var a=sdata(s.key).slice(S0,L+1); return {label:s.name, data:a, borderColor:css(s.color), backgroundColor:css(s.color), borderWidth:s.width, pointRadius:0, pointHoverRadius:4, tension:.15, hidden:!s.on, spanGaps:false};});
+  var all=[]; ds.forEach(function(d){d.data.forEach(function(v){if(v!==null) all.push(v);});});
+  var ymin=Math.min(20,Math.floor(Math.min.apply(null,all)/10)*10), ymax=Math.max(80,Math.ceil(Math.max.apply(null,all)/10)*10);
+  var RIB=12;
+  var deco={id:"deco",
+    beforeDatasetsDraw:function(ch){var c=ch.ctx, X=ch.scales.x, Y=ch.scales.y, a=ch.chartArea; c.save();
+      CRISES.forEach(function(k,ci){var i=labels.indexOf(k.a), j=labels.indexOf(k.b); if(i<0||j<0) return; var l=X.getPixelForValue(i), r=X.getPixelForValue(j);
+        c.fillStyle=css("--band"); c.fillRect(l,a.top,r-l,a.bottom-a.top); c.fillStyle=css("--muted"); c.font='11px "IBM Plex Mono", monospace'; c.textAlign="left"; c.fillText(k.t,l+4,a.top+12+(narrow?ci*13:0));});
+      c.strokeStyle=css("--muted"); c.globalAlpha=.7; c.setLineDash([4,4]); c.lineWidth=1;
+      [40,60].forEach(function(v){var y=Y.getPixelForValue(v); c.beginPath(); c.moveTo(a.left,y); c.lineTo(a.right,y); c.stroke();});
+      c.restore();},
+    afterDraw:function(ch){var c=ch.ctx, X=ch.scales.x, a=ch.chartArea, n=labels.length, bw=(a.right-a.left)/Math.max(1,n-1), y=a.bottom+6; c.save();
+      for(var i=0;i<n;i++){var rg=G.regime[S0+i]; if(!rg) continue; c.fillStyle=alpha(css(REG[rg].col),.85); var x=X.getPixelForValue(i); c.fillRect(x-bw/2,y,bw+.6,RIB);}
+      c.restore();}};
+  if(histChart) histChart.destroy();
+  var tc=css("--muted"), gc=css("--line");
+  histChart=new Chart($("hist"),{type:"line", data:{labels:labels, datasets:ds}, plugins:[deco],
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"index",intersect:false},
+      scales:{x:{grid:{display:false},ticks:{color:tc,padding:RIB+10,autoSkip:false,maxRotation:0,callback:function(v,i){var d=labels[i]; return d.slice(5)==="01" && (+d.slice(0,4)%(narrow?2:1)===0) ? d.slice(0,4) : null;}}},
+              y:{min:ymin,max:ymax,ticks:{color:tc,stepSize:10},grid:{color:alpha(gc,.7)}}},
+      plugins:{legend:{display:false},
+        tooltip:{itemSort:function(a,b){return a.datasetIndex-b.datasetIndex;}, callbacks:{title:function(it){return mlong(labels[it[0].dataIndex]);}, label:function(c){return c.dataset.label+" : "+fx(c.raw,0);},
+          footer:function(it){var rg=G.regime[S0+it[0].dataIndex]; return rg?"Régime mondial : "+REG[rg].name:"";}}}}}});
+}
+
+/* ================= Zones ================= */
+function bar(s){var st=state(s); return '<div class="track"><div class="fill" style="width:'+Math.max(0,Math.min(100,s))+'%;background:var(--'+st.c+')"></div><div class="mid"></div></div>';}
+function renderZones(){var box=$("zoneCards"); box.innerHTML="";
+  ZK.forEach(function(k){var z=D.zones[k], s=z.score[L], st=state(s), d3=s-z.score[L-3], rg=REG[z.regime[L]];
+    var h='<div class="zonehead"><div><div class="kicker">Zone</div><h3 style="font-size:18px">'+ZN[k]+'</h3><span class="regime-chip" style="padding:3px 8px;margin-top:6px;font-size:12px"><i style="background:var('+rg.col+')"></i>'+rg.name+'</span></div><div style="text-align:right"><div class="zscore">'+fx(s,0)+'</div><span class="pill '+st.c+'">'+st.t+'</span><div class="small '+dcls(d3)+'" style="margin-top:4px">'+sg(d3,1)+' pt sur 3 mois</div></div></div>';
+    COMP.forEach(function(c){var v=z.sous_scores[c.k][L], se=serieOf(k,c.k);
+      h+='<div class="comp"><span class="lab">'+c.label+' <span class="raw">('+c.fmt(z.brut[c.k][L])+')</span><span class="dt">'+(se?esc(se.libelle)+', '+esc(se.source)+' · dernière donnée '+dateSerie(se):'')+badge(se)+'</span></span><span class="sc">'+fx(v,0)+'</span>'+bar(v)+'</div>';});
+    h+='<div class="comp"><span class="lab">Socle de risque mondial <span class="raw">(20 %)</span></span><span class="sc">'+fx(D.risque.score[L],0)+'</span>'+bar(D.risque.score[L])+'</div>';
+    var tx=k==="us"?serieOf("valorisation","tips"):(D.series||[]).filter(function(s){return s.groupe==="valorisation"&&s.id&&s.id.indexOf(k+"_")===0;})[0];
+    h+='<div class="comp"><span class="lab">Hors score : attrait obligataire <span class="raw">(taux réel '+fx(z.taux_reel[L],2)+' %)</span>'+(tx?'<span class="dt">'+esc(tx.libelle)+' · dernière donnée '+dateSerie(tx)+'</span>':'')+'</span><span class="sc">'+fx(z.attrait_oblig[L],0)+'</span>'+bar(z.attrait_oblig[L])+'</div>';
+    box.appendChild(el("div",{class:"card zonecard",style:"--c:var("+ZC[k]+")"},h));});
+}
+
+/* ================= Risque ================= */
+function renderRisk(){var box=$("riskCards"); box.innerHTML="";
+  RISK.forEach(function(r){var s=D.risque.sous_scores[r.k][L], st=state(s), d3=s-D.risque.sous_scores[r.k][L-3], se=serieOf("socle",r.k), raw=D.risque.brut[r.k];
+    box.appendChild(el("div",{class:"card stripe",style:"--s:var(--"+st.c+")"},'<h3>'+r.label+'</h3><div class="small muted">'+r.sub+'</div><div class="rv">'+r.fmt(raw[L])+'</div><div class="row small"><span class="pill '+st.c+'">'+(Math.round(s)>=60?"Tension faible":Math.round(s)>=40?"Tension modérée":"Tension élevée")+'</span><span class="muted">sous-score '+fx(s,0)+'</span><span class="'+dcls(d3)+'">'+sg(d3,0)+' sur 3 mois</span></div><div style="margin-top:10px">'+spark(raw,"--"+st.c)+'</div><div class="small muted">2016 à '+mlab(D.dates[L])+(se?' · dernière donnée '+dateSerie(se)+' ('+esc(se.source)+' '+esc(se.code)+')':'')+badge(se)+'</div>'));});
+}
+
+/* ================= Allocation ================= */
+function ranked(){return ZK.slice().sort(function(a,b){return D.zones[b].score[L]-D.zones[a].score[L];});}
+function allocTitle(a){var t= a[0]>=65?"Surpondérer les actions": a[0]>=55?"Proche de la référence 60 / 40": a[0]>=40?"Sous-pondérer modérément les actions":"Posture défensive"; return t+" ("+a[0]+" % actions)";}
+function stepLabel(s){
+  if(s.etape==="regime") return "1. Base du régime : "+REG[s.regime].name;
+  if(s.etape==="climat") return s.regle==="degrade"?"2. Climat dégradé ("+fx(s.valeur,0)+" < 40) : actions −10 vers liquidités" : s.regle==="favorable"?"2. Climat favorable ("+fx(s.valeur,0)+" ≥ 60) : actions +5" : "2. Climat neutre ("+fx(s.valeur,0)+") : pas d'ajustement";
+  if(s.etape==="valorisation") return s.regle==="cheres"?"3. Actions chères (attrait "+fx(s.valeur,0)+" < 35) : actions −10 vers "+(s.vers==="oblig"?"obligations":"liquidités") : s.regle==="bon_marche"?"3. Actions bon marché (attrait "+fx(s.valeur,0)+" > 65) : actions +5" : "3. Valorisation normale (attrait "+fx(s.valeur,0)+") : pas d'ajustement";
+  return esc(s.etape);
+}
+var LAB=["Actions","Oblig. d'État","Actifs réels","Liquidités"], COL=["var(--us)","var(--ea)","var(--real)","var(--muted)"];
+function stack(id,a,short){var h=""; a.forEach(function(p,i){if(p>0) h+='<div style="width:'+p+'%;background:'+COL[i]+'" title="'+LAB[i]+' '+p+' %">'+(!short&&p>=16?LAB[i]+" "+p+" %":p>=7?p+" %":"")+'</div>';}); $(id).innerHTML=h;}
+function renderAlloc(){
+  var al=G.allocation, tb=$("steps"); tb.innerHTML="";
+  al.etapes.forEach(function(st,j){var prev=j?al.etapes[j-1].repartition:null;
+    tb.appendChild(el("tr",null,'<td>'+stepLabel(st)+'</td>'+st.repartition.map(function(v,i){var d=prev?v-prev[i]:0; return '<td class="n">'+v+' %'+(d?' <span class="small '+dcls(d)+'">('+(d>0?"+":"−")+Math.abs(d)+')</span>':'')+'</td>';}).join("")));});
+  tb.appendChild(el("tr",{style:"background:var(--band)"},'<td><strong>Orientation retenue ('+(mode==="cap"?"pondération capi":"pondération égale")+')</strong></td>'+al.finale.map(function(v){return '<td class="n"><strong>'+v+' %</strong></td>';}).join("")));
+  stack("stackRef",[60,40,0,0]); stack("stackNow",al.finale);
+  var rk=ranked(), o=["Surpondérer","Neutre","Sous-pondérer"], tr=$("rank"); tr.innerHTML="";
+  rk.forEach(function(k,i){var z=D.zones[k], rg=REG[z.regime[L]], d3=z.score[L]-z.score[L-3];
+    tr.appendChild(el("tr",null,"<td class='num'>"+(i+1)+"</td><td style='white-space:nowrap'><span style='display:inline-block;width:10px;height:10px;border-radius:2px;background:var("+ZC[k]+");margin-right:8px'></span>"+ZN[k]+"</td><td><span class='regime-chip' style='padding:2px 7px;font-size:12px'><i style='background:var("+rg.col+")'></i>"+rg.name+"</span></td><td class='n'>"+fx(z.score[L],0)+"</td><td class='n "+dcls(d3)+"'>"+sg(d3,1)+"</td><td>"+o[i]+"</td>"));});
+}
+
+/* ================= Sources ================= */
+function renderSources(){
+  var pz=D.poids.zones;
+  $("capNote").textContent="Score mondial : moyenne des zones pondérée par la capitalisation boursière (États-Unis "+fx(pz.us*100,0)+" %, zone euro "+fx(pz.ea*100,0)+" %, Japon "+fx(pz.jp*100,0)+" %, estimation à partir des fiches MSCI"+(D.poids.maj_capi?" de "+mlong(D.poids.maj_capi):"")+") ou à parts égales.";
+  var ss=D.series||[], nok=ss.filter(function(s){return s.statut==="ok";}).length;
+  $("srcNote").textContent=ss.length+" séries, "+nok+" à jour. Date de la dernière observation publiée par chaque source, relevée lors de la collecte du "+new Date(D.genere_le).toLocaleDateString("fr-FR")+".";
+  var order=["socle","us","ea","jp","valorisation"], tb=$("srcTable"); tb.innerHTML="";
+  order.forEach(function(g){ss.filter(function(s){return s.groupe===g;}).forEach(function(s){
+    tb.appendChild(el("tr",null,'<td style="white-space:nowrap">'+esc(GROUPES[g])+'</td><td>'+esc(s.libelle)+'</td><td>'+esc(s.source)+(s.code?' <code>'+esc(s.code)+'</code>':'')+'</td><td>'+esc(FREQ[s.frequence]||s.frequence||"")+'</td><td class="num" style="white-space:nowrap">'+dateSerie(s)+'</td><td><span class="status '+esc(s.statut||"ok")+'">'+(STATUT[s.statut]||esc(s.statut))+'</span>'+(s.message?'<div class="small muted" style="margin-top:3px">'+esc(s.message)+'</div>':'')+'</td>'));});});
+}
+
+var rt; window.addEventListener("resize",function(){clearTimeout(rt); rt=setTimeout(function(){if(D){renderHist();}},200);});
+})();
+</script>
+</body>
+</html>

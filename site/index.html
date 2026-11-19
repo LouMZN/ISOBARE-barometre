@@ -364,7 +364,7 @@ var ZC = {us:"--us", ea:"--ea", jp:"--jp"};
 var COMP = [
   {k:"gdp",   label:"Croissance du PIB",       art:"la croissance du PIB",         fmt:function(v){return fx(v,1)+" %";}},
   {k:"cli",   label:"Indicateur avancé OCDE",  art:"l'indicateur avancé de l'OCDE", fmt:function(v){return fx(v,1);}},
-  {k:"infl",  label:"Inflation (écart à 2 %)", art:"l'inflation",                  fmt:function(v){return fx(v,1)+" %";}},
+  {k:"infl",  label:"Inflation (écart à 2 %)", art:"l'inflation",                  fmt:function(v){return fx(v,1)+" % sur un an";}},
   {k:"eq",    label:"Tendance actions",        art:"la tendance des actions",      fmt:function(v){return sg(v*100,1)+" %";}},
   {k:"slope", label:"Pente 10 ans − 3 mois",   art:"la pente des taux",            fmt:function(v){return sg(v,2)+" pt";}}
 ];

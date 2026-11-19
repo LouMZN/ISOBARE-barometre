@@ -1,0 +1,43 @@
+# Mise à jour quotidienne du baromètre : lance collect/collect.py, vérifie les
+# contributions, puis enregistre site/data.json dans le dépôt (Netlify republie).
+# Lancement manuel : onglet Actions > daily > Run workflow.
+name: daily
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # chaque jour vers 6 h UTC (GitHub peut décaler de quelques minutes)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer les dépendances
+        run: pip install -r collect/requirements.txt
+      - name: Collecter et calculer
+        run: python collect/collect.py
+      - name: Tester les contributions
+        run: python -m unittest discover -s tests -v
+      - name: Enregistrer data.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data.json
+          if git diff --cached --quiet; then
+            echo "data.json inchangé"
+          else
+            git commit -m "Mise à jour des données du $(date -u +%d/%m/%Y)"
+            git push
+          fi

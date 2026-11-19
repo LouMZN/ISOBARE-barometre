@@ -60,8 +60,6 @@ BASES = {"Expansion": {"A": 65, "O": 25, "R": 5, "L": 5},
          "Surchauffe": {"A": 50, "O": 10, "R": 30, "L": 10},
          "Ralentissement": {"A": 35, "O": 50, "R": 5, "L": 10},
          "Stagflation": {"A": 30, "O": 15, "R": 30, "L": 25}}
-# Hypothèse (non précisée par la note) : bonus de régime pour le classement des zones.
-BONUS_REGIME = {"Expansion": 5, "Surchauffe": 0, "Ralentissement": 0, "Stagflation": -5}
 
 EPISODES = {"2008": ("2008-01", "2008-12"), "2020": ("2020-01", "2020-12"),
             "2022": ("2022-01", "2022-12")}
@@ -386,16 +384,16 @@ def allocation(reg, score, attrait_a, attrait_o):
 
 
 def preference_geo(sz, regimes_zones, t):
-    """Classement : score de climat + variation sur 3 mois + bonus de régime (hypothèse)."""
+    """Classement des zones selon leur seul score de climat (note v4).
+    La variation sur 3 mois et le régime sont fournis pour information, sans effet sur le rang."""
     lignes = []
     for z in ZONES:
-        var3 = sz[z].iloc[t] - sz[z].iloc[t - 3]
-        reg = regimes_zones[z].iloc[t]
-        pts = sz[z].iloc[t] + var3 + BONUS_REGIME.get(reg, 0)
         lignes.append({"zone": z, "nom": ZONES[z], "score": arrondi(sz[z].iloc[t]),
-                       "variation_3m": arrondi(var3), "regime": reg, "points": arrondi(pts)})
-    lignes.sort(key=lambda x: -x["points"])
+                       "variation_3m": arrondi(sz[z].iloc[t] - sz[z].iloc[t - 3]),
+                       "regime": regimes_zones[z].iloc[t], "_tri": sz[z].iloc[t]})
+    lignes.sort(key=lambda x: -x["_tri"])
     for rang, l in enumerate(lignes):
+        del l["_tri"]
         l["rang"] = rang + 1
         l["position"] = ("Surpondérer" if rang == 0 else
                          "Sous-pondérer" if rang == len(lignes) - 1 else "Neutre")
@@ -568,7 +566,7 @@ def main():
         "parametres": {"ponderations": PONDERATIONS, "poids_zone": POIDS_ZONE,
                        "poids_socle": POIDS_SOCLE, "bases_regime": BASES,
                        "seuil_croissance": SEUIL_CROISSANCE, "seuil_inflation": SEUIL_INFLATION,
-                       "fenetre_climat_mois": FENETRE_CLIMAT, "bonus_regime": BONUS_REGIME},
+                       "fenetre_climat_mois": FENETRE_CLIMAT},
         "libelles": {"zones": ZONES, "indicateurs": LIBELLES},
         "sources": etat,
         "sources_en_echec": [e["serie"] for e in etat if e["statut"].startswith("ÉCHEC")],

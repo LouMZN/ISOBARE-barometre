@@ -98,6 +98,26 @@ class TestAllocation(unittest.TestCase):
                          ["Expansion", "Expansion", "Expansion", "Expansion", "Surchauffe"])
 
 
+class TestPreferenceGeo(unittest.TestCase):
+    """Note v4 : classement des zones par score de climat uniquement."""
+
+    def test_classement_par_score_seul(self):
+        idx = pd.date_range("2020-01-01", periods=4, freq="MS")
+        # us : score le plus haut mais en forte baisse et en stagflation ;
+        # jp : score le plus bas mais en forte hausse et en expansion.
+        sz = pd.DataFrame({"us": [90, 80, 70, 60], "ez": [50, 50, 50, 55], "jp": [10, 20, 30, 54]},
+                          index=idx)
+        regimes = {"us": pd.Series(["Stagflation"] * 4, index=idx),
+                   "ez": pd.Series(["Ralentissement"] * 4, index=idx),
+                   "jp": pd.Series(["Expansion"] * 4, index=idx)}
+        lignes = c.preference_geo(sz, regimes, 3)
+        self.assertEqual([l["zone"] for l in lignes], ["us", "ez", "jp"])
+        self.assertEqual([l["rang"] for l in lignes], [1, 2, 3])
+        self.assertEqual([l["position"] for l in lignes], ["Surpondérer", "Neutre", "Sous-pondérer"])
+        self.assertNotIn("points", lignes[0])
+        self.assertEqual(lignes[2]["variation_3m"], 44)
+
+
 @unittest.skipUnless(DATA.exists(), "site/data.json absent : lancer collect.py d'abord")
 class TestDataJson(unittest.TestCase):
     """Vérifie les chiffres publiés (arrondis à 4 décimales)."""
@@ -120,6 +140,14 @@ class TestDataJson(unittest.TestCase):
     def test_zones(self):
         for z, bloc in self.d["zones"].items():
             self.verifier(bloc, f"zone {z}")
+
+    def test_preference_geo_triee_par_score(self):
+        pg = self.d["preference_geographique"]
+        scores = [l["score"] for l in pg]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        self.assertEqual(scores, sorted((self.d["zones"][z]["score"] for z in self.d["zones"]),
+                                        reverse=True))
+        self.assertNotIn("bonus_regime", self.d["parametres"])
 
     def test_scores_bornes(self):
         for bloc in list(self.d["monde"].values()) + list(self.d["zones"].values()):

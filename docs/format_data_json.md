@@ -34,8 +34,7 @@ partir du bloc `brut`, et contrôle « somme des contributions = variation ».
     "poids_zone":  {"pib": 0.15, "cli": 0.15, "inflation": 0.20, "actions": 0.15, "pente": 0.15},
     "poids_socle": {"vix": 0.05, "credit": 0.05, "gpr": 0.05, "brent": 0.05},
     "bases_regime": {"Expansion": {"A": 65, "O": 25, "R": 5, "L": 5}, ...},
-    "seuil_croissance": 50, "seuil_inflation": 2.5, "fenetre_climat_mois": 120,
-    "bonus_regime": {"Expansion": 5, "Surchauffe": 0, "Ralentissement": 0, "Stagflation": -5}
+    "seuil_croissance": 50, "seuil_inflation": 2.5, "fenetre_climat_mois": 120
   },
   "libelles": {"zones": {"us": "États-Unis", ...}, "indicateurs": {"pib": "Croissance du PIB", ...}},
 
@@ -107,10 +106,10 @@ partir du bloc `brut`, et contrôle « somme des contributions = variation ».
     "historique_attrait_actions": {"dates": [...], "valeurs": [...]}
   },
 
-  "preference_geographique": [
-    {"zone": "jp", "nom": "Japon", "score": 57.7, "variation_3m": -10.96, "regime": "Expansion",
-     "points": 51.73,                 // score + variation 3 mois + bonus de régime
-     "rang": 1, "position": "Surpondérer"}, ...
+  "preference_geographique": [       // trié par score de climat décroissant (note v4)
+    {"zone": "jp", "nom": "Japon", "score": 57.7,
+     "variation_3m": -10.96, "regime": "Expansion",   // pour information, sans effet sur le rang
+     "rang": 1, "position": "Surpondérer"}, ...       // 1er : Surpondérer, dernier : Sous-pondérer
   ],
 
   "limites": ["...", ...],

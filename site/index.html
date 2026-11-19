@@ -755,8 +755,7 @@ function renderAlloc(){
   var tr=$("rank"); tr.innerHTML="";
   (D.preference_geographique||[]).forEach(function(p){var rg=REG[p.regime]||{col:"--muted"};
     tr.appendChild(el("tr",null,"<td class='num'>"+p.rang+"</td><td style='white-space:nowrap'><span style='display:inline-block;width:10px;height:10px;border-radius:2px;background:var("+ZC[p.zone]+");margin-right:8px'></span>"+esc(p.nom)+"</td><td><span class='regime-chip' style='padding:2px 7px;font-size:12px'><i style='background:var("+rg.col+")'></i>"+esc(p.regime)+"</span></td><td class='n'>"+fx(p.score,0)+"</td><td class='n "+dcls(p.variation_3m)+"'>"+sg(p.variation_3m,1)+"</td><td>"+esc(p.position)+"</td>"));});
-  var b=D.parametres.bonus_regime||{};
-  $("rankNote").textContent="Classement par points : score de climat de la zone + variation sur 3 mois + bonus de régime ("+RK.map(function(r){return r.toLowerCase()+" "+sg(b[r]||0,0);}).join(", ")+"). Chaque zone est notée par rapport à sa propre histoire : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres dans l'absolu ».";
+  $("rankNote").textContent="Classement par score de climat de zone, comme le prévoit la note de cadrage ; la variation sur 3 mois et le régime sont donnés pour information et n'influencent pas le rang. Indépendant de la pondération du score mondial. Chaque zone est notée par rapport à sa propre histoire : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres dans l'absolu ».";
 }
 
 /* ================= Test historique ================= */

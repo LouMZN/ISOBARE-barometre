@@ -53,6 +53,7 @@ header.top{background:var(--surface); border-bottom:1px solid var(--line)}
 header.top .wrap{display:flex; flex-wrap:wrap; gap:12px 24px; align-items:flex-end; justify-content:space-between; padding-top:22px; padding-bottom:14px}
 .kicker{font:500 12px/1.3 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
 h1{font:600 30px/1.15 var(--display); margin:6px 0 0; text-wrap:balance}
+.fn{font-size:12px; vertical-align:super; line-height:0; margin-left:1px}
 h2{font:600 21px/1.25 var(--display); margin:0 0 4px; text-wrap:balance}
 h3{font:600 15px/1.3 var(--body); margin:0}
 @media (max-width:520px){h1{font-size:25px} h2{font-size:19px}}
@@ -429,6 +430,14 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
           <tr><td class="muted">Non retenue</td><td class="muted">—</td><td>Flux de capitaux</td><td class="n muted">0 %</td></tr>
         </tbody></table></div>
         <p class="small muted" style="margin:10px 0 0">Hors score, pour la valorisation : PER de Shiller<button type="button" class="tip" data-tip="cape" aria-label="Définition : CAPE">?</button>, taux réel 10 ans américain (TIPS<button type="button" class="tip" data-tip="tips" aria-label="Définition : TIPS">?</button>) et taux 10 ans de la zone euro et du Japon.</p></div>
+      <div class="card anc" id="perimetre" style="margin-top:12px">
+        <h3>Périmètre : trois zones</h3>
+        <ul class="small" style="padding-left:18px; margin:8px 0 0">
+          <li><strong>Ce qu'elles couvrent.</strong> Environ 76 % de l'indice actions mondial MSCI ACWI (États-Unis 63,6 % et Japon 5,1 % de l'indice à fin août 2026, zone euro environ 7 % d'après la fiche MSCI EMU d'octobre 2026 : les mêmes données que la pondération par capitalisation) et 45 % du PIB mondial nominal en 2025 (FMI, <cite>World Economic Outlook</cite>, octobre 2026 : États-Unis 26,0 %, zone euro 15,2 %, Japon 3,8 %).</li>
+          <li><strong>Pourquoi ce choix.</strong> Le baromètre sert à orienter une allocation : il suit les marchés les plus investissables, pour lesquels des données gratuites sont collectables automatiquement chaque jour.</li>
+          <li><strong>Le reste du monde n'est pas absent.</strong> Le socle de risque (VIX, spread de crédit, risque géopolitique, Brent) capte les chocs mondiaux qui se transmettent aux marchés, y compris ceux venus de Chine ou des pays émergents.</li>
+        </ul>
+      </div>
     </div>
 
     <div class="mblock">
@@ -486,13 +495,14 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
           <div class="tablewrap" style="margin-top:8px"><table class="compact">
             <thead><tr><th>Niveau</th><th class="n">Poids</th><th>Justification</th></tr></thead>
             <tbody>
-              <tr><td>Familles : croissance, inflation, marchés, risque</td><td class="n">30 / 20 / 30 / 20</td><td>Grille d'exemple du cours (séance 1, slides 4 et 5), reprise par la note de cadrage (section 4).</td></tr>
+              <tr><td>Familles : croissance, inflation, marchés, risque</td><td class="n">30 / 20 / 30 / 20</td><td>Croissance et marchés financiers, moteurs directs du prix des actifs, pèsent 30&nbsp;% chacun ; inflation et risque, qui agissent surtout en conditionnant ces deux moteurs, 20&nbsp;% chacun (note de cadrage, section 4).</td></tr>
               <tr><td>Regroupement par famille</td><td class="n">—</td><td>Neutralise la double comptabilisation d'indicateurs corrélés (VIX et spread, PIB et indicateur avancé) : note, section 8.</td></tr>
               <tr><td>Risque : socle commun aux trois zones</td><td class="n">20 %</td><td>Le risque est traité comme mondial et entre pour 20 % dans chaque score de zone (note, section 3).</td></tr>
-              <tr><td>Partage égal dans chaque famille : PIB et CLI, actions et pente</td><td class="n">15 + 15</td><td>Rien ne permet de juger un indicateur plus important que l'autre au sein d'une même famille : le poids de la famille est donc partagé à parts égales. Ce choix, fixé a priori comme les seuils, évite d'ajuster les poids sur le passé.</td></tr>
-              <tr><td>Partage égal du socle : VIX, spread, GPR, Brent</td><td class="n">4 × 5</td><td>Les quatre indicateurs mesurent des risques différents (marchés, crédit, géopolitique, pétrole), sans hiérarchie établie entre eux : un poids égal évite d'en privilégier un.</td></tr>
+              <tr><td>Partage égal dans chaque famille : PIB et CLI, actions et pente</td><td class="n">15 + 15</td><td>Rien ne permet de juger un indicateur plus important que l'autre au sein d'une même famille : le poids de la famille est donc partagé à parts égales. Ce choix, fixé a priori comme les seuils, évite d'ajuster les poids sur le passé.<a class="fn" href="#note-ocde" aria-label="Voir la note 1">1</a></td></tr>
+              <tr><td>Partage égal du socle : VIX, spread, GPR, Brent</td><td class="n">4 × 5</td><td>Les quatre indicateurs mesurent des risques différents (marchés, crédit, géopolitique, pétrole), sans hiérarchie établie entre eux : un poids égal évite d'en privilégier un.<a class="fn" href="#note-ocde" aria-label="Voir la note 1">1</a></td></tr>
             </tbody></table></div>
           <p class="small muted" style="margin:10px 0 0"><code>Score de zone = Σ poids × sous-score</code> : 80 % d'indicateurs de la zone, 20 % de socle de risque.</p>
+          <p class="small muted anc" id="note-ocde" style="margin:8px 0 0"><sup>1</sup> La pondération égale est le choix de la plupart des indicateurs composites (« most composite indicators rely on equal weighting ») ; le manuel de référence note qu'elle peut aussi traduire l'absence de base empirique pour différencier les poids, ce qui est le cas ici. OCDE et Centre commun de recherche de la Commission européenne (JRC), <cite>Handbook on Constructing Composite Indicators: Methodology and User Guide</cite>, OECD Publishing, 2008 (Nardo, Saisana, Saltelli, Tarantola, Hoffmann, Giovannini), p. 31.</p>
         </div>
         <div class="card">
           <h3>Poids par zone (score mondial)</h3>
@@ -518,7 +528,7 @@ footer{margin:36px 0 0; padding:20px 0 40px; border-top:1px solid var(--line); c
       <p>Le sujet cite les flux de capitaux parmi les indicateurs possibles. Les séries de référence sont payantes : aucune source gratuite et automatisable n'a été retenue. Le baromètre couvre les sept autres catégories, mais ne voit pas les mouvements d'argent entre zones et classes d'actifs, qui peuvent précéder ou amplifier les variations de marché.</p>
     </div>
     <div class="grid limits" style="margin-top:16px">
-      <div class="card"><h3>Chine exclue</h3><p>Aucune source gratuite et automatisable n'a été trouvée pour trois des quatre indicateurs de zone chinois. Le Japon la remplace ; la Chine reste présente via l'indice de risque géopolitique.</p></div>
+      <div class="card"><h3>Chine exclue</h3><p>Aucune source gratuite et automatisable n'a été trouvée pour trois des quatre indicateurs de zone chinois. Le Japon la remplace ; la Chine reste présente via l'indice de risque géopolitique. Choix des trois zones : voir <a href="#perimetre">Périmètre</a>.</p><p style="margin-top:8px">Ce que le baromètre ne voit pas : les économies émergentes et en développement font 60,5 % du PIB mondial en parité de pouvoir d'achat (FMI, <cite>World Economic Outlook</cite>, octobre 2026, année 2025), alors que le reste du monde, émergents compris, ne pèse qu'environ un quart de l'indice MSCI ACWI.</p></div>
       <div class="card"><h3>Valorisation actions : États-Unis seulement</h3><p>Pas de PER de Shiller en accès libre pour la zone euro et le Japon. L'attrait des actions repose sur le marché américain, qui pèse environ 84 % de la capitalisation des trois zones.</p></div>
       <div class="card"><h3>Seuils fixés a priori</h3><p>Les seuils (40, 60, 35, 65, 2,5 %) et les répartitions par régime sont posés a priori et non calibrés sur le passé : les optimiser rendrait tout test historique trompeur. Une zone proche d'un seuil peut changer de régime d'un mois à l'autre.</p></div>
       <div class="card"><h3>Corrélation n'est pas causalité</h3><p>Le baromètre ne prédit pas les rendements. Les corrélations entre classes d'actifs montent en période de crise : la diversification protège moins quand on en a le plus besoin.</p></div>

@@ -48,7 +48,24 @@ LIBELLES = {"pib": "Croissance du PIB", "cli": "Indicateur avancé OCDE",
             "pente": "Pente 10 ans - 3 mois", "vix": "VIX", "credit": "Spread de crédit Baa",
             "gpr": "Risque géopolitique", "brent": "Choc pétrolier (Brent)"}
 
-PONDERATIONS = {"capi": {"us": 0.84, "ez": 0.09, "jp": 0.07},
+# Parts des zones dans l'indice MSCI ACWI (note de cadrage, section 5.4). Seule saisie à
+# faire chaque trimestre : les poids par capitalisation et le sous-titre du site en découlent.
+MSCI = {"date": "2026-08",                               # fiche MSCI ACWI de fin août 2026
+        "parts_acwi": {"us": 63.6, "ez": 7.0, "jp": 5.1},  # en % de l'indice MSCI ACWI
+        "approximatif": True}  # zone euro : capitalisation MSCI EMU / ACWI « environ 7 % » (fiche EMU d'octobre 2026)
+
+
+def poids_capi(parts):
+    """Parts MSCI renormalisées sur les trois zones, arrondies au centième ; la plus grande
+    zone reçoit le reliquat pour que la somme fasse exactement 1."""
+    total = sum(parts.values())
+    w = {z: round(v / total, 2) for z, v in parts.items()}
+    grande = max(w, key=w.get)
+    w[grande] = round(1 - sum(v for z, v in w.items() if z != grande), 2)
+    return w
+
+
+PONDERATIONS = {"capi": poids_capi(MSCI["parts_acwi"]),
                 "egal": {"us": 1 / 3, "ez": 1 / 3, "jp": 1 / 3}}
 
 FENETRE_CLIMAT = 120   # 10 ans glissants
@@ -566,7 +583,8 @@ def main():
         "parametres": {"ponderations": PONDERATIONS, "poids_zone": POIDS_ZONE,
                        "poids_socle": POIDS_SOCLE, "bases_regime": BASES,
                        "seuil_croissance": SEUIL_CROISSANCE, "seuil_inflation": SEUIL_INFLATION,
-                       "fenetre_climat_mois": FENETRE_CLIMAT},
+                       "fenetre_climat_mois": FENETRE_CLIMAT,
+                       "msci": {**MSCI, "total_acwi": round(sum(MSCI["parts_acwi"].values()), 1)}},
         "libelles": {"zones": ZONES, "indicateurs": LIBELLES},
         "sources": etat,
         "sources_en_echec": [e["serie"] for e in etat if e["statut"].startswith("ÉCHEC")],

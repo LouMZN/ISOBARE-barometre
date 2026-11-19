@@ -34,7 +34,9 @@ partir du bloc `brut`, et contrôle « somme des contributions = variation ».
     "poids_zone":  {"pib": 0.15, "cli": 0.15, "inflation": 0.20, "actions": 0.15, "pente": 0.15},
     "poids_socle": {"vix": 0.05, "credit": 0.05, "gpr": 0.05, "brent": 0.05},
     "bases_regime": {"Expansion": {"A": 65, "O": 25, "R": 5, "L": 5}, ...},
-    "seuil_croissance": 50, "seuil_inflation": 2.5, "fenetre_climat_mois": 120
+    "seuil_croissance": 50, "seuil_inflation": 2.5, "fenetre_climat_mois": 120,
+    "msci": {"date": "2026-08", "parts_acwi": {"us": 63.6, "ez": 7.0, "jp": 5.1},  // % de l'indice MSCI ACWI
+             "approximatif": true, "total_acwi": 75.7}   // source des poids capi et du sous-titre du site
   },
   "libelles": {"zones": {"us": "États-Unis", ...}, "indicateurs": {"pib": "Croissance du PIB", ...}},
 

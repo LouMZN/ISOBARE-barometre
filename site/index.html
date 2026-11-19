@@ -516,7 +516,9 @@ function renderStatic(){renderVal(); renderZones(); renderRisk(); renderSources(
 function renderAlerts(){
   var box=$("alerts"), h="", msgs=[];
   (D.sources||[]).forEach(function(s){var st=statSrc(s); if(st.c==="ok") return;
-    msgs.push('<strong>'+esc(s.groupe)+' · '+esc(s.serie)+'</strong> ('+st.t.toLowerCase()+', dernière donnée : '+dateSrc(s)+')'+(st.c==="secours"?' : '+esc(s.statut)+(s.erreur?' ['+esc(s.erreur)+']':''):''));});
+    var quoi= st.c==="secours" ? (/aucune valeur/i.test(s.statut||"") ? "échec de collecte, aucune valeur disponible" : "échec de collecte, valeur précédente conservée")
+      : /secours/i.test(s.statut||"") ? "copie de secours utilisée" : "publication en retard";
+    msgs.push('<strong>'+esc(s.groupe)+' · '+esc(s.serie)+'</strong> : '+quoi+(s.derniere_date?' (dernière donnée : '+dateSrc(s)+')':'')+(st.c==="secours"&&s.erreur?'. Cause : '+esc(String(s.erreur).replace(/[.\s]+$/,"")):'')+'.');});
   if(msgs.length) h+='<div class="notice'+((D.sources_en_echec||[]).length?' bad':'')+'"><strong>Points d\'attention sur les données</strong><ul>'+msgs.map(function(m){return "<li>"+m+"</li>";}).join("")+'</ul></div>';
   box.innerHTML=h;
 }

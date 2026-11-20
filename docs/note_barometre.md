@@ -1,81 +1,75 @@
 ---
-title: "Isobare — baromètre synthétique mondial"
-subtitle: "KEDGE BS · Gestion d'actifs 2025-2026 · Note méthodologique et lecture au 20 novembre 2026"
+title: "Isobare — notre baromètre synthétique mondial"
+subtitle: "KEDGE BS · Gestion d'actifs 2025-2026 · Note explicative, données au 20 novembre 2026"
 lang: fr
 ---
 
-**Site : [https://isobare.netlify.app](https://isobare.netlify.app)** — mis à jour chaque jour automatiquement. Données de cette note : `data.json` généré le 20/11/2026 (6 h 56 UTC), mois de calcul novembre 2026, 28 séries sur 28 collectées sans échec ; dernières observations de 09/2026 (PIB du T3) à 11/2026 (marchés).
+**Site : [https://isobare.netlify.app](https://isobare.netlify.app)** (mis à jour automatiquement chaque matin).
 
-Le baromètre éclaire l'allocation entre actions (A), obligations d'État (O), actifs réels (R) et liquidités (L) sur trois zones : États-Unis, zone euro, Japon. Il répond à trois questions : *quel est le climat ?* (score 0-100), *est-il déjà dans les prix ?* (valorisation), *dans quelle direction va-t-on ?* (régime, variations, contributions).
+**L'idée en bref.** Un investisseur doit décider comment répartir son argent entre actions, obligations, actifs réels (matières premières, immobilier) et liquidités. Les informations utiles sont nombreuses et parlent des « langues » différentes : un PIB en %, un indice boursier en points, un prix du pétrole en dollars. Notre baromètre les rassemble en **un seul score de 0 à 100** pour trois zones (États-Unis, zone euro, Japon) : **50 = situation normale**, au-dessus le climat est favorable, en dessous il est défavorable. Le site montre aussi si les marchés sont chers et ce que cela implique pour l'allocation.
 
-## 1. Choix des indicateurs (attendu 1)
+## 1. Les indicateurs choisis (attendu 1)
 
-Neuf indicateurs, soit 19 séries, couvrent **sept des huit familles** du sujet (PIB, inflation, indices boursiers, volatilité, taux, matières premières, risque/incertitude). Sens : une hausse améliore (+) ou dégrade (−) le score.
+Nous avons retenu **9 indicateurs**, qui couvrent **7 des 8 familles** proposées dans le sujet. Le signe indique si une hausse de l'indicateur améliore (+) ou dégrade (−) le score.
 
-| Indicateur (poids, sens) | Série et source | Pourquoi cet indicateur |
-|------------------|--------------------------|----------------------------------------|
-| **Croissance (30 %)** | | |
-| PIB réel, glissement annuel (15 %, +) | GDPC1 (FRED) ; EA20 (Eurostat) ; Japon (OCDE) | Mesure directe de l'activité, socle des bénéfices. Trimestriel et publié avec retard, d'où l'indicateur suivant. |
-| Indicateur avancé CLI (15 %, +) | CLI de l'OCDE par zone (API SDMX) | Anticipe de 6 à 9 mois les retournements ; méthode identique pour les trois zones. |
-| **Inflation (20 %)** | | |
-| Écart d'inflation à 2 % (20 %, −) | PCE (FRED) ; IPCH (BCE) ; IPC (DBnomics) | Cible des banques centrales : au-dessus, resserrement ; en dessous, demande faible. Chaque zone est mesurée sur l'indice que cible sa banque centrale. |
-| **Marchés financiers (30 %)** | | |
-| Tendance actions (15 %, +) | S&P 500, Nikkei 225 (FRED) ; Euro Stoxx 50 (BCE) | Anticipations de bénéfices ; le ratio cours / moyenne 12 mois rend comparables des indices de niveaux différents. |
-| Pente 10 ans − 3 mois (15 %, +) | T10Y3M (FRED) ; courbe AAA (BCE) ; taux OCDE (Japon) | Indicateur avancé de récession le plus reconnu : une courbe inversée les a précédées. |
-| **Risque — socle mondial (20 %)** | | |
-| VIX (5 %, −) | VIXCLS (FRED) | Volatilité implicite à 30 jours : thermomètre mondial de l'aversion au risque. |
-| Spread de crédit (5 %, −) | BAA10Y (FRED) | Prix du risque de défaut ; préféré au spread haut rendement, dont l'historique gratuit est tronqué. |
-| Risque géopolitique (5 %, −) | Indice GPR (Caldara et Iacoviello) | Seule mesure chiffrée, gratuite et mensuelle des tensions ; intègre la Chine, absente des zones. |
-| Choc pétrolier (5 %, −) | Brent, cours / moyenne 12 mois (FRED) | Choc d'offre qui freine la croissance et relance l'inflation ; l'écart à la tendance isole le choc. |
-| **Valorisation (hors score, corrige l'allocation)** | | |
-| Attrait actions / obligations | CAPE (Shiller) ; taux réels 10 ans (FRED, BCE, OCDE) | 1/CAPE − taux réel US : rendement des bénéfices face au placement réel sans risque. Taux réel 10 ans par zone pour les obligations. |
+| Famille (poids) | Indicateur | Ce qu'il nous apprend |
+|--------------|------------------|----------------------------------------------|
+| Croissance (30 %) | PIB réel (+) | L'économie produit-elle plus qu'il y a un an ? C'est la base des bénéfices des entreprises. |
+| | Indicateur avancé de l'OCDE, CLI (+) | Le PIB arrive en retard ; le CLI annonce les retournements de l'économie environ 6 à 9 mois à l'avance. |
+| Inflation (20 %) | Écart de l'inflation à 2 % (−) | 2 % est l'objectif des banques centrales. Plus on s'en éloigne (vers le haut ou le bas), plus elles risquent d'agir brutalement. |
+| Marchés (30 %) | Tendance des actions (+) | Le cours de l'indice (S&P 500, Euro Stoxx 50, Nikkei) comparé à sa moyenne sur 12 mois : les marchés montent-ils ou baissent-ils ? |
+| | Pente des taux 10 ans − 3 mois (+) | Quand les taux courts dépassent les taux longs (courbe « inversée »), une récession a souvent suivi. |
+| Risque, commun aux 3 zones (20 %) | VIX (−) | La « peur » des investisseurs, mesurée par la volatilité attendue des actions. |
+| | Spread de crédit (−) | Le surcoût payé par les entreprises pour emprunter : il monte quand le risque de faillite augmente. |
+| | Risque géopolitique, GPR (−) | Les tensions dans le monde (guerres, crises), mesurées à partir de la presse. |
+| | Prix du pétrole Brent (−) | Une flambée du pétrole freine la croissance et relance l'inflation. |
 
-**Écartés** : flux de capitaux (séries de référence payantes) ; taux directeurs et change (effet ambigu, affichés en contexte) ; Chine (pas de séries gratuites d'inflation, de courbe et d'indice boursier).
+En plus du score, nous mesurons la **valorisation** : les actions sont-elles chères (ratio cours / bénéfices de Shiller, dit CAPE) et les obligations rapportent-elles plus que l'inflation (taux réel) ? Nous avons **écarté** les flux de capitaux, car les données sont payantes, et la Chine, faute de données gratuites fiables (elle reste présente à travers le risque géopolitique).
 
-## 2. Sources de données (attendu 2)
+## 2. Les sources de données (attendu 2)
 
-Sources **publiques, gratuites, sans clé d'API** : bases publiques par fichiers CSV (**FRED**, Fed de Saint-Louis) ; API SDMX institutionnelles (**BCE** – ECB Data Portal, **OCDE**, **Eurostat**) ; agrégateur **DBnomics** ; fichiers Excel des chercheurs (**R. Shiller** : CAPE et séries longues du test historique ; **Caldara et Iacoviello** : GPR). Le site affiche, pour chacune des 28 séries, sa source, son statut et la date de sa dernière donnée.
+Toutes nos sources sont **publiques et gratuites** : **FRED** (banque de données de la Réserve fédérale de Saint-Louis : VIX, pétrole, S&P 500, taux et données américaines), **BCE** et **Eurostat** (zone euro), **OCDE** (indicateurs avancés, données japonaises), **DBnomics** (prix au Japon), et les fichiers mis en ligne par les chercheurs **Robert Shiller** (CAPE) et **Caldara et Iacoviello** (risque géopolitique). Au total, 28 séries.
 
-## 3. Méthode de collecte (attendu 3)
+## 3. La méthode de collecte (attendu 3)
 
-Script **Python** (pandas, requests, xlrd/openpyxl) lancé chaque jour à 6 h UTC par **GitHub Actions**, puis publication automatique sur **Netlify** (page statique, graphiques Chart.js). Chaque exécution : (1) télécharge les séries ; (2) les ramène en mensuel (dernière valeur connue du mois) ; (3) calcule scores, régimes, valorisation, contributions, allocation et test historique ; (4) contrôle par test automatisé que la somme des contributions égale la variation du score ; (5) enregistre `data.json`. **Robustesse** : si une source échoue, la dernière valeur connue est conservée et l'échec est signalé sur le site.
+Nous avons écrit un programme en **Python**. Chaque matin à 6 h (heure UTC), **GitHub Actions** le lance automatiquement : il télécharge les 28 séries, les met toutes au rythme mensuel (dernière valeur connue du mois), calcule les scores et enregistre le résultat dans un fichier (`data.json`). Le site, hébergé sur **Netlify**, lit ce fichier et affiche les graphiques. Si une source ne répond pas, le programme garde la dernière valeur connue et le site le signale. Aucune saisie manuelle n'est nécessaire.
 
-## 4. Normalisation et pondération (attendu 4)
+## 4. Rendre les données comparables : normalisation (attendu 4)
 
-- **Z-score sur 10 ans glissants** (120 mois, 36 au minimum), **écrêté à ±3**, converti en sous-score **(z + 3) / 6 × 100** : 50 = moyenne décennale de la zone. Préféré au Min-Max, sensible aux extrêmes (2008, 2020) ; la fenêtre de 10 ans, imposée par la série la plus courte, suit les changements de régime de taux.
-- **Inversion pour le risque** : VIX, spread, GPR et Brent entrent avec un signe négatif. **Cible** : l'inflation est mesurée par son écart absolu à 2 % ; une inflation trop basse est pénalisée comme une inflation trop forte.
-- **Valorisation** : Z-score sur l'historique long (fenêtre croissante depuis 2003), les cycles de valorisation durant plusieurs décennies.
+**Le problème** : on ne peut pas additionner un VIX à 24,6 et une inflation à 3,3 %. Il faut d'abord tout ramener sur la même échelle.
 
-## 5. Construction du score global et choix des pondérations (attendu 5)
+**Notre solution : le Z-score.** Pour chaque indicateur, nous regardons de combien il s'écarte de sa moyenne des **10 dernières années**, en nombre d'écarts-types (l'écart « habituel »). Nous plafonnons ce résultat entre −3 et +3, puis le convertissons en note sur 100 : **sous-score = (Z + 3) / 6 × 100**.
 
-- **Score de zone** = Σ poids × sous-score, soit 80 % d'indicateurs de zone et 20 % de socle mondial. Les poids **30 / 20 / 30 / 20** sont fixés par famille : raisonner par famille neutralise la double comptabilisation d'indicateurs corrélés (PIB et CLI ; VIX et spread) ; l'inflation, seule de sa famille, pèse 20 %.
-- **Score mondial** = moyenne des zones pondérée par la **capitalisation** (États-Unis 84 %, zone euro 9 %, Japon 7 %, parts MSCI ACWI renormalisées) : la lecture d'un investisseur. Le site propose aussi des **parts égales** (lecture économique), la pondération capi faisant du score mondial un score quasi américain.
-- **Régime** : croissance = moyenne des sous-scores PIB et CLI (seuil 50) ; inflation en glissement annuel (seuil 2,5 %). Quatre régimes, chacun avec une base A/O/R/L : expansion 65/25/5/5, surchauffe 50/10/30/10, ralentissement 35/50/5/10, stagflation 30/15/30/25.
-- **Allocation en trois étapes** : base du régime → climat (score < 40 : actions −10 vers L ; ≥ 60 : +5) → valorisation (attrait actions < 35 : −10 vers O si attrait O ≥ 50, sinon vers L ; > 65 : +5). Préférence géographique par classement des scores de zone.
-- **Dynamique** : variations à 1, 3 et 12 mois ; contribution = poids de zone × poids de l'indicateur × variation du sous-score, dont la somme égale exactement la variation du score.
+> **Exemple avec le VIX** : il vaut 24,6 aujourd'hui, contre une moyenne de 18,8 sur 10 ans et un écart-type de 6,9. Il est donc 0,84 écart-type au-dessus de la normale. Comme un VIX élevé est une mauvaise nouvelle, on **inverse** le signe (−0,84), ce qui donne un sous-score de **36/100**.
+
+Nous avons préféré le Z-score à la méthode Min-Max, qui dépend trop des valeurs extrêmes (crise de 2008, Covid en 2020). Deux ajustements complètent la méthode : l'**inversion** pour les indicateurs de risque (VIX, crédit, géopolitique, pétrole) et la **cible** pour l'inflation, où l'on mesure l'écart à 2 % : une inflation trop faible est pénalisée comme une inflation trop forte.
+
+## 5. Le score global et le choix des pondérations (attendu 5)
+
+**Score d'une zone** = moyenne pondérée de ses 9 sous-scores, avec les poids du tableau : **30 % croissance, 20 % inflation, 30 % marchés, 20 % risque**. Nous avons fixé les poids par famille plutôt que par indicateur pour ne pas compter deux fois la même information (le PIB et le CLI racontent en partie la même chose). Croissance et marchés pèsent le plus car ce sont les moteurs directs des bénéfices et des cours.
+
+**Score mondial** = moyenne des trois zones, pondérée par le **poids de chaque zone en Bourse** : États-Unis 84 %, zone euro 9 %, Japon 7 %. C'est ce que vit un investisseur qui détient un portefeuille mondial. Comme le score devient alors très américain, le site propose aussi une version à **parts égales**.
+
+**Du score à l'allocation.** Le baromètre classe la situation dans l'un des quatre « régimes » ci-dessous, selon la croissance (au-dessus ou en dessous de 50) et l'inflation (au-dessus ou en dessous de 2,5 %). Chaque régime a une répartition de départ (en % : actions / obligations / actifs réels / liquidités), ensuite corrigée : on retire 10 points d'actions si le score passe sous 40 ou si les actions sont très chères.
+
+| | Inflation basse (< 2,5 %) | Inflation haute (≥ 2,5 %) |
+|---|---|---|
+| **Croissance forte (≥ 50)** | Expansion : 65 / 25 / 5 / 5 | Surchauffe : 50 / 10 / 30 / 10 |
+| **Croissance faible (< 50)** | Ralentissement : 35 / 50 / 5 / 10 | Stagflation : 30 / 15 / 30 / 25 |
 
 ## 6. Analyse et interprétation (attendu 6)
 
-**Quels indicateurs pèsent le plus ?** *Par construction*, en pondération capi, les cinq indicateurs américains font 67 % du score mondial (inflation US 16,8 %, chacun des quatre autres 12,6 %), le socle 20 %, la zone euro 7,2 % et le Japon 5,6 %. *En pratique*, ce qui fait bouger le score est plus concentré (contributions en points de score) :
-
-| Horizon | Δ score | Principaux soutiens | Principaux freins |
-|-----------|----:|--------------------------|--------------------------|
-| Niveau (écart à 50) | +1,7 | CLI US (+2,2), spread de crédit (+1,0), pente US (+0,7) | Tendance actions US (−1,6), VIX (−0,7), GPR (−0,6) |
-| 1 mois | −0,5 | Brent (+1,3), inflation US (+0,4) | Tendance actions US (−1,3), VIX (−0,6) |
-| 3 mois | −4,4 | Brent (+0,4), inflation US (+0,4) | Tendance actions US (−2,5), VIX (−1,1), GPR (−0,4) |
-| 12 mois | −3,9 | CLI US (+1,8), pente US (+1,4), crédit (+0,4) | Tendance actions US (−3,3), inflation US (−1,1), VIX (−1,0) |
-
-La **tendance du S&P 500** est le premier moteur sur tous les horizons (forte variabilité et poids américain). Le **sentiment de marché** (actions, VIX) se dégrade alors que les **fondamentaux** (CLI, pente, crédit) restent porteurs.
+**Quels indicateurs pèsent le plus ?** Avec la pondération boursière, les indicateurs américains représentent **67 %** du score mondial ; l'inflation américaine est à elle seule l'indicateur le plus lourd (16,8 %). Mais ce qui fait **bouger** le score, c'est surtout la **tendance du S&P 500** : sur 3 mois, le score a perdu 4,4 points, dont 2,5 viennent de la baisse relative des actions américaines et 1,1 de la hausse du VIX. À l'inverse, l'indicateur avancé de l'OCDE (+1,8 point sur 12 mois) et la pente des taux américains (+1,4) soutiennent le score.
 
 **Quels signaux aujourd'hui ?**
 
-- **Climat neutre, en dégradation** : score mondial **51,7/100** (54,3 à parts égales), −4,4 points sur 3 mois, dans la zone sans ajustement (40-60). VIX à 24,6.
-- **Surchauffe**, confirmée sur deux mois : croissance 56,8 > 50, inflation 3,3 % > 2,5 % (États-Unis 3,3 %, zone euro 4,0 %). Le Japon (2,1 %) est seul en expansion.
-- **Actions très chères** : CAPE 39,4 ; rendement des bénéfices 2,5 % < taux réel 2,9 %, soit une prime de **−0,34 point** ; attrait **9,7/100**. Obligations attractives (attrait 75,0 ; taux réel US 2,9 %).
-- **Lecture d'allocation : A 40 / O 20 / R 30 / L 10** (base surchauffe 50/10/30/10, puis −10 points d'actions vers les obligations pour cause de valorisation), contre 60/40 en référence. **Géographie** : surpondérer le Japon (61,3, porté par une inflation proche de 2 % et une courbe pentue), neutre États-Unis (51,1), sous-pondérer la zone euro (50,5).
+- **Climat neutre mais en dégradation** : score mondial **51,7/100** (54,3 à parts égales), −4,4 points en 3 mois. Les marchés deviennent plus nerveux alors que l'économie réelle tient encore.
+- **Régime de surchauffe** : la croissance reste solide (56,8) mais l'inflation est trop élevée (3,3 % ; 4,0 % en zone euro). Seul le Japon (2,1 %) est en expansion.
+- **Actions très chères** : le CAPE américain est à 39,4. Une action « rapporte » environ 2,5 % de bénéfices par an, moins qu'une obligation américaine protégée de l'inflation (2,9 %). Les actions n'offrent donc aucune prime pour leur risque.
+- **Ce que suggère le baromètre** : **40 % actions, 20 % obligations, 30 % actifs réels, 10 % liquidités**, contre 60 % actions et 40 % obligations dans un portefeuille classique. Par zone : privilégier le **Japon** (score 61,3), rester neutre sur les États-Unis (51,1), alléger la zone euro (50,5).
 
-**Test historique** (illustration, non preuve ; actifs américains) : en 2022, −9,3 % contre −15,1 % pour le 60/40 (perte maximale −10,8 % contre −18,8 %), grâce à des obligations limitées et 30 % d'actifs réels ; en 2020, +12,2 % contre +16,2 % : la règle amortit les baisses mais rate une partie des rebonds rapides. En 2008, −17,2 % contre −19,6 %, mais ce gain s'inverse dans les trois autres variantes (parts égales ou régime confirmé : −21,1 % à −26,9 %) : seul 2022 est robuste.
+**Le baromètre aurait-il aidé dans le passé ?** En 2022, année où actions et obligations ont baissé ensemble, notre règle aurait perdu −9,3 % contre −15,1 % pour un portefeuille 60/40, grâce à sa part d'actifs réels. En 2020, elle aurait moins bien profité du rebond (+12,2 % contre +16,2 %). En 2008, le résultat dépend des réglages : c'est une illustration, pas une preuve.
 
 ## Limites
 
-Le site n'est **pas une recommandation d'investissement**. Chine exclue (présente via le GPR) ; valorisation des actions fondée sur le seul **CAPE américain** ; **seuils** (40, 60, 35, 65, 2,5 %) et bases par régime **fixés a priori**, non calibrés, pour éviter le sur-ajustement ; **flux de capitaux absents** ; CLI zone euro approché par quatre pays ; séries datées par période de référence et non de publication, ce qui flatte le test historique (PIB notamment) ; normalisation par zone : un score élevé signifie « bon au regard de son passé », pas « meilleur que les autres zones ».
+Le baromètre est un **outil pédagogique, pas un conseil en investissement**. La Chine n'est pas couverte ; la valorisation des actions repose sur le seul CAPE américain ; nos seuils (50, 2,5 %, 40…) ont été fixés à l'avance, sans optimisation sur le passé ; les flux de capitaux manquent. Enfin, chaque zone est comparée à **sa propre histoire** : un score élevé veut dire « mieux que d'habitude », pas « mieux que les autres zones ».

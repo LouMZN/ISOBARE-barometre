@@ -47,7 +47,17 @@ Nous avons préféré le Z-score à la méthode Min-Max, qui dépend trop des va
 
 ## 5. Le score global et le choix des pondérations (attendu 5)
 
-**Score d'une zone** = moyenne pondérée de ses 9 sous-scores, avec les poids du tableau : **30 % croissance, 20 % inflation, 30 % marchés, 20 % risque**. Nous avons fixé les poids par famille plutôt que par indicateur pour ne pas compter deux fois la même information (le PIB et le CLI racontent en partie la même chose). Croissance et marchés pèsent le plus car ce sont les moteurs directs des bénéfices et des cours.
+**Score d'une zone** = moyenne pondérée de ses 9 sous-scores, avec les poids du tableau : **30 % croissance, 20 % inflation, 30 % marchés, 20 % risque**.
+
+**Pourquoi ces poids ?** Nous sommes partis de la grille 30 / 20 / 30 / 20 proposée en exemple dans le cours, et nous l'avons gardée parce qu'elle correspond à notre façon de lire l'économie :
+
+- **Croissance et marchés (30 % chacun)** sont les **moteurs directs** du prix des actifs. La croissance fait les bénéfices des entreprises ; les marchés (tendance des actions, courbe des taux) montrent ce que les investisseurs anticipent déjà. Ce sont eux qui décident si l'environnement est porteur.
+- **Inflation et risque (20 % chacun)** agissent surtout **à travers ces deux moteurs** : une inflation trop forte pousse les banques centrales à monter leurs taux, ce qui freine la croissance et fait baisser les cours ; un choc de risque (peur, crise, flambée du pétrole) fait de même. Ils comptent, mais comme des freins ou des amplificateurs, d'où un poids un peu plus faible.
+- **Équilibre** : l'économie réelle (croissance + inflation) et les marchés (marchés + risque) pèsent chacun **50 %**, si bien qu'aucun des deux points de vue n'écrase l'autre.
+- **À l'intérieur d'une famille**, le poids est partagé à parts égales (PIB 15 % et CLI 15 % ; 5 % pour chacun des 4 indicateurs de risque), car rien ne permet de dire qu'un indicateur compte plus que l'autre. C'est le choix le plus courant pour les indicateurs composites (manuel OCDE-JRC, 2008). Raisonner par famille évite aussi de compter deux fois la même information (PIB et CLI racontent en partie la même chose).
+- **Le risque est commun aux trois zones** : la peur sur les marchés ou une crise géopolitique touchent tout le monde en même temps.
+
+Ces poids sont **fixés à l'avance**, sans les optimiser sur le passé (ce qui reviendrait à « tricher » avec l'historique). Nous avons vérifié qu'ils ne changent pas les conclusions : avec 25 % pour chaque famille, le score mondial serait de 51,6 au lieu de 51,7, et le classement des zones serait identique.
 
 **Score mondial** = moyenne des trois zones, pondérée par le **poids de chaque zone en Bourse** : États-Unis 84 %, zone euro 9 %, Japon 7 %. C'est ce que vit un investisseur qui détient un portefeuille mondial. Comme le score devient alors très américain, le site propose aussi une version à **parts égales**.
 

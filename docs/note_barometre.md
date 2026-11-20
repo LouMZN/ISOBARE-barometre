@@ -1,6 +1,7 @@
 ---
 title: "Isobare — notre baromètre synthétique mondial"
 subtitle: "KEDGE BS · Gestion d'actifs 2025-2026 · Note explicative, données au 20 novembre 2026"
+author: 'Groupe : Kaloufina ASSADILLAH · Lou MAZERAN\-\-MAGNAN · Inès ESPINAT · Faith HERITAGE · Jade MONNET'
 lang: fr
 ---
 
